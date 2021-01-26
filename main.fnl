@@ -1,9 +1,45 @@
 (local bump (require :lib/bump))
 (local anim8 (require :lib/anim8))
+(local push (require :lib/push))
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
 (local (WIDTH HEIGHT) (love.graphics.getDimensions))
-(local world (bump.newWorld 32))
+(local [GAME_WIDTH GAME_HEIGHT] [12 16])
+(push:setupScreen (* GAME_WIDTH 8) (* GAME_HEIGHT 8) WIDTH HEIGHT)
+
+(local world (bump.newWorld 8))
+
+(local tileSheet (love.graphics.newImage "assets/tiles.png"))
+(local tileAtlas {})
+(for [i 0 19]
+  (for [j 0 19]
+    (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
+
+(local map {})
+(for [x 1 GAME_WIDTH]
+  (table.insert map [])
+  (for [y 1 GAME_HEIGHT]
+    (table.insert (. map x) 400)))
+
+(fn setTile [x y tile]
+  (tset (. map x) y tile)
+  (world:add {} (* 8 (- x 1)) (* 8 (- y 1)) 8 8))
+
+(for [x 1 GAME_WIDTH]
+  (setTile x GAME_HEIGHT 181))
+(for [y 1 GAME_HEIGHT]
+  (setTile 1 y 181)
+  (setTile GAME_WIDTH y 181))
+(setTile 4 9 181)
+(setTile 4 8 181)
+(setTile 4 7 181)
+(setTile 9 13 181)
+(setTile 10 13 181)
+(setTile 11 13 181)
+(setTile 12 13 181)
+(setTile 6 9 181)
+(setTile 7 9 181)
+(setTile 8 9 181)
 
 (local characterImage (love.graphics.newImage "assets/astro.png"))
 (local characterGrid (anim8.newGrid 8 8 120 8))
@@ -18,6 +54,9 @@
 (fn opposite [operation]
   (if (= operation add) sub add))
 
+(local SPEED 40)
+(local WEIGHT 456)
+(local JUMP_GRAVITY -80)
 ; speed      - horizontal speed
 ; jumping    - whether the player is in the process of jumping (input)
 ; jumpTimer - how long player has been holding jump
@@ -27,23 +66,11 @@
 ; gravity    - multiplier for pulling player down
 ; weight     - multiplier for gravity
 ; direction  - moving left or right 
-(local player {:x 64 :y (- HEIGHT 64) :width 32 :height 32 :speed 100 :direction add :jumping false
-               :onWall false :onGround true :hasJump false :gravity 0 :weight 650
+(local player {:x 16 :y 112 :speed SPEED :direction add :jumping false
+               :onWall false :onGround true :hasJump false :gravity 0 :weight WEIGHT
                :jumpTimer 0})
 
-(fn createRect [x y width height] {: x : y : width : height})
-(local ground 
-  [(createRect 0 (- HEIGHT 32) WIDTH 32)
-   (createRect 128 256 32 128)
-   (createRect (- WIDTH 32) 0 32 HEIGHT)
-   (createRect 0 0 32 HEIGHT)])
-
-(fn add-object [object]
-  (world:add object object.x object.y object.width object.height))
-
-(add-object player)
-(each [index rect (pairs ground)]
-  (add-object rect))
+(world:add player player.x player.y 8 8)
 
 (fn filter [item other] "slide")
 
@@ -62,23 +89,25 @@
           (do 
             (set player.gravity 0)
             (set player.onGround true)
-            (set player.speed 100)
+            (set player.speed SPEED)
             (set player.hasJump false))
+          ; we hit a ceiling
           (= col.normal.y 1)
           (do 
-            (set player.gravity 50))))
+            (set player.gravity 25))))
     ; we fell off a wall
     (when (and (= len 0) player.onWall)
       (set player.onWall false)
       (set player.gravity 50)
-      (set player.weight 650)
-      (set player.speed 0))
+      (set player.weight WEIGHT)
+      (set player.speed 0)
+      (set player.direction (opposite player.direction)))
     (set player.x actualX)
     (set player.y actualY)))
 
 (fn normalJump []
   (set player.jumping true)
-  (set player.gravity -150)
+  (set player.gravity JUMP_GRAVITY)
   (set player.onGround false)
   (set player.hasJump true))
 
@@ -87,11 +116,11 @@
     (set player.hasJump false))
   (set player.jumping true)
   (set player.direction (opposite player.direction))
-  (set player.gravity -150)
+  (set player.gravity JUMP_GRAVITY)
   (set player.onGround false)
   (set player.onWall false)
-  (set player.weight 650)
-  (set player.speed 100))
+  (set player.weight WEIGHT)
+  (set player.speed SPEED))
 
 (fn jumpPlayer []
   (set player.animation die)
@@ -105,7 +134,7 @@
         y (+ player.y (* player.gravity dt))]
     (if (and player.jumping (love.keyboard.isDown "space") (< player.jumpTimer 0.3)) 
       (do 
-        (set player.gravity (- player.gravity 2))
+        (set player.gravity (+ player.gravity 2))
         (set player.jumpTimer (+ player.jumpTimer dt)))
       (do 
         (set player.gravity (+ player.gravity (* player.weight dt)))
@@ -124,12 +153,13 @@
   (love.graphics.rectangle "line" rect.x rect.y rect.width rect.height))
 
 (fn love.draw []
+  (push:start)
   (love.graphics.setLineWidth 2)
-  (love.graphics.setColor 0.6 0.6 1)
-  (each [index rect (pairs ground)]
-    (draw-ground rect))
-  (love.graphics.setColor 1 1 1)
-  (let [orientation (if (= player.direction add) 4 -4)
+  (for [x 1 GAME_WIDTH]
+    (for [y 1 GAME_HEIGHT]
+      (love.graphics.draw tileSheet (. tileAtlas (. (. map x) y)) (* (- x 1) 8) (* (- y 1) 8))))
+  (let [orientation (if (= player.direction add) 1 -1)
         ox (if (= player.direction add) 0 8)]
-   (walk:draw characterImage player.x player.y 0 orientation 4 ox)))
+    (walk:draw characterImage player.x player.y 0 orientation 1 ox))
+  (push:finish))
   

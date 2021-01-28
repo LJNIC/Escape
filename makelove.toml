@@ -3,12 +3,12 @@ default_targets = ["win32", "win64", "appimage"]
 build_directory = "makelove-build"
 
 love_files = [
-    "::git-ls-tree::",
-    "-*/.*",
+    "*.lua",
+    "./lib/*",
+    "./assets/*"
 ]
 
 [hooks]
-
 prebuild = [
 	"./run.py -s -l"
 ]

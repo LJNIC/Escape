@@ -39,6 +39,11 @@
 (map.setTile 8 9 181)
 (map.setTile 5 GAME_HEIGHT 389)
 (map.setTile 6 GAME_HEIGHT 389)
+(map.setTile 11 6 211)
+(map.setTile 11 5 211)
+(map.setTile 11 4 211)
+(map.setTile 11 3 211)
+(map.setTile 11 2 211)
 
 (local characterImage (love.graphics.newImage "assets/astro.png"))
 (local characterGrid (anim8.newGrid 8 8 120 8))
@@ -72,12 +77,42 @@
                :hasJump false :onWall false :onGround true :gravity 0 :weight WEIGHT
                :animation walk :image characterImage :alive true})
 
-(world:add player player.x player.y 8 8)
+(world:add player player.x player.y 6 8)
 
 (fn killPlayer []
   (set player.image explosionImage)
   (set player.animation die)
   (set player.alive false))
+
+(fn normalJump []
+  (set player.jumping true)
+  (set player.gravity JUMP_GRAVITY)
+  (set player.onGround false)
+  (set player.hasJump true))
+
+(fn wallJump []
+  (when (not player.onWall)
+    (set player.hasJump false))
+  (set player.jumping true)
+  (set player.direction (opposite player.direction))
+  (set player.gravity JUMP_GRAVITY)
+  (set player.onGround false)
+  (set player.onWall false)
+  (set player.weight WEIGHT)
+  (set player.speed SPEED))
+
+(fn jumpPlayer []
+  (if (or player.onWall player.hasJump)
+      (wallJump)
+      player.onGround
+      (normalJump)))
+
+(fn bouncePlayer []
+  (if player.onWall
+    (wallJump)
+    (do 
+      (set player.direction (opposite player.direction))
+      (normalJump))))
 
 (fn handleGround [col]
   (if 
@@ -108,7 +143,9 @@
         col.other.ground 
         (handleGround col)
         col.other.death
-        (killPlayer)))
+        (killPlayer)
+        col.other.bounce
+        (bouncePlayer)))
     ; we fell off a wall
     (when (and (= len 0) player.onWall)
       (set player.onWall false)
@@ -119,29 +156,6 @@
     (when player.alive 
       (set player.x actualX)
       (set player.y actualY))))
-
-(fn normalJump []
-  (set player.jumping true)
-  (set player.gravity JUMP_GRAVITY)
-  (set player.onGround false)
-  (set player.hasJump true))
-
-(fn wallJump []
-  (when (not player.onWall)
-    (set player.hasJump false))
-  (set player.jumping true)
-  (set player.direction (opposite player.direction))
-  (set player.gravity JUMP_GRAVITY)
-  (set player.onGround false)
-  (set player.onWall false)
-  (set player.weight WEIGHT)
-  (set player.speed SPEED))
-
-(fn jumpPlayer []
-  (if (or player.onWall player.hasJump)
-      (wallJump)
-      player.onGround
-      (normalJump)))
 
 (fn love.update [dt]
   (let [x (player.direction player.x (* player.speed dt))
@@ -176,7 +190,7 @@
   (let [right (= player.direction add)
         dead (not player.alive)
         orientation (if right 1 -1)
-        ox (if right (if dead 4 0) (if dead 12 8))]
+        ox (if right (if dead 4 0) (if dead 12 6))]
     (player.animation:draw player.image player.x player.y 0 orientation 1 ox (if dead 4 0)))
   (push:finish))
   

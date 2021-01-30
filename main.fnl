@@ -1,26 +1,19 @@
 (local bump (require :lib/bump))
 (local anim8 (require :lib/anim8))
 (local push (require :lib/push))
-(local gamera (require :lib/gamera))
+(local camera (require :lib/camera))
 
-(local map (require :map))
-
-(global (WIDTH HEIGHT) (love.graphics.getDimensions))
 (global [GAME_WIDTH GAME_HEIGHT] [12 32])
-
-(local camera (gamera.new 0 0 WIDTH (+ HEIGHT 128)))
-(local [BASE_X BASE_Y] [240 448])
-(camera:setPosition BASE_X 448)
-
-(fn updateCamera [dy]
-  (let [(x y) (camera:getPosition)]
-    (camera:setPosition x (- BASE_Y (- 240 dy)))))
+(global [WIDTH HEIGHT] [(* GAME_WIDTH 8) (* 8 16)])
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
-(push:setupScreen (* GAME_WIDTH 8) (* 16 8) WIDTH HEIGHT)
-(map.init)
+(push:setupScreen (* GAME_WIDTH 8) (* 16 8) (love.graphics.getDimensions))
+(local cam (camera 0 0 WIDTH HEIGHT))
+(cam:setBounds 0 0 WIDTH (* GAME_HEIGHT 8))
 
 (global world (bump.newWorld 8))
+(local map (require :map))
+(map.init)
 
 (global tileSheet (love.graphics.newImage "assets/tiles.png"))
 (global tileAtlas {})
@@ -143,7 +136,6 @@
       (set player.speed 0)
       (set player.direction (opposite player.direction)))
     (when player.alive 
-      (updateCamera actualY)
       (set player.x actualX)
       (set player.y actualY))))
 
@@ -159,6 +151,8 @@
         (set player.jumping false)
         (set player.jumpTimer 0)))
     (move-player x y))
+  (cam:update dt)
+  (cam:follow (/ WIDTH 2) player.y)
   (player.animation:update dt))
 
 (fn love.keypressed [key]
@@ -184,6 +178,8 @@
 
 (fn love.draw []
   (push:start)
-  (camera:draw draw)
+  (cam:attach)
+  (draw)
+  (cam:detach)
   (push:finish))
   

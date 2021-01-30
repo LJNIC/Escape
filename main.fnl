@@ -1,14 +1,23 @@
 (local bump (require :lib/bump))
 (local anim8 (require :lib/anim8))
 (local push (require :lib/push))
+(local gamera (require :lib/gamera))
 
 (local map (require :map))
 
 (global (WIDTH HEIGHT) (love.graphics.getDimensions))
-(global [GAME_WIDTH GAME_HEIGHT] [12 16])
+(global [GAME_WIDTH GAME_HEIGHT] [12 32])
+
+(local camera (gamera.new 0 0 WIDTH (+ HEIGHT 128)))
+(local [BASE_X BASE_Y] [240 448])
+(camera:setPosition BASE_X 448)
+
+(fn updateCamera [dy]
+  (let [(x y) (camera:getPosition)]
+    (camera:setPosition x (- BASE_Y (- 240 dy)))))
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
-(push:setupScreen (* GAME_WIDTH 8) (* GAME_HEIGHT 8) WIDTH HEIGHT)
+(push:setupScreen (* GAME_WIDTH 8) (* 16 8) WIDTH HEIGHT)
 (map.init)
 
 (global world (bump.newWorld 8))
@@ -24,26 +33,6 @@
 (for [y 1 GAME_HEIGHT]
   (map.setTile 1 y 181)
   (map.setTile GAME_WIDTH y 181))
-(map.setTile 4 9 181)
-(map.setTile 4 8 181)
-(map.setTile 4 7 181)
-(map.setTile 9 13 181)
-(map.setTile 10 13 181)
-(map.setTile 11 13 181)
-(map.setTile 12 13 181)
-(map.setTile 9 12 181)
-(map.setTile 10 12 389)
-(map.setTile 11 12 389)
-(map.setTile 6 9 181)
-(map.setTile 7 9 181)
-(map.setTile 8 9 181)
-(map.setTile 5 GAME_HEIGHT 389)
-(map.setTile 6 GAME_HEIGHT 389)
-(map.setTile 11 6 211)
-(map.setTile 11 5 211)
-(map.setTile 11 4 211)
-(map.setTile 11 3 211)
-(map.setTile 11 2 211)
 
 (local characterImage (love.graphics.newImage "assets/astro.png"))
 (local characterGrid (anim8.newGrid 8 8 120 8))
@@ -73,7 +62,7 @@
 ; animation  - which animation to draw (walk, die, jump, etc)
 ; image      - the corresponding image for the animation
 ; alive      - whether the player is dead or alive
-(local player {:x 16 :y 112 :speed SPEED :direction add :jumping false :jumpTimer 0
+(local player {:x 16 :y 240 :speed SPEED :direction add :jumping false :jumpTimer 0
                :hasJump false :onWall false :onGround true :gravity 0 :weight WEIGHT
                :animation walk :image characterImage :alive true})
 
@@ -154,6 +143,7 @@
       (set player.speed 0)
       (set player.direction (opposite player.direction)))
     (when player.alive 
+      (updateCamera actualY)
       (set player.x actualX)
       (set player.y actualY))))
 
@@ -184,13 +174,16 @@
 (fn draw-ground [rect]
   (love.graphics.rectangle "line" rect.x rect.y rect.width rect.height))
 
-(fn love.draw []
-  (push:start)
+(fn draw []
   (map.draw)
   (let [right (= player.direction add)
         dead (not player.alive)
         orientation (if right 1 -1)
         ox (if right (if dead 4 0) (if dead 12 6))]
-    (player.animation:draw player.image player.x player.y 0 orientation 1 ox (if dead 4 0)))
+    (player.animation:draw player.image player.x player.y 0 orientation 1 ox (if dead 4 0))))
+
+(fn love.draw []
+  (push:start)
+  (camera:draw draw)
   (push:finish))
   

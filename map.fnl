@@ -1,7 +1,7 @@
 (local map {})
 (local tiles {})
 
-; find better way to handle tiles
+; TODO find better way to handle tiles
 (local tileTypes 
   {:lava {:action :death :width 8 :height 8 :offX 0}
    :ground {:action :ground :width 8 :height 8 :offX 0}

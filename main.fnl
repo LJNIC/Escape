@@ -3,13 +3,17 @@
 (local push (require :lib/push))
 (local camera (require :lib/camera))
 
-(global [GAME_WIDTH GAME_HEIGHT] [12 32])
-(global [WIDTH HEIGHT] [(* GAME_WIDTH 8) (* 8 16)])
+; game width is 2 tiles wider than we actually render
+(global [GAME_WIDTH GAME_HEIGHT] [14 32])
+(global [WIDTH HEIGHT] [96 128])
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
-(push:setupScreen (* GAME_WIDTH 8) (* 16 8) (love.graphics.getDimensions))
-(local cam (camera 0 0 WIDTH HEIGHT))
-(cam:setBounds 0 0 WIDTH (* GAME_HEIGHT 8))
+(push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
+
+; again, we render 2 tiles less than our total width
+(local cam (camera 0 0 (- WIDTH 16) HEIGHT))
+; shift the camera bound up one tile, and shrink it one tile
+(cam:setBounds 8 0 (- WIDTH 8) (* GAME_HEIGHT 8))
 
 (global world (bump.newWorld 8))
 (local map (require :map))
@@ -21,11 +25,11 @@
   (for [j 0 19]
     (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
 
-(for [x 1 GAME_WIDTH]
+(for [x 1  GAME_WIDTH]
   (map.setTile x GAME_HEIGHT 181))
-(for [y 1 GAME_HEIGHT]
-  (map.setTile 1 y 181)
-  (map.setTile GAME_WIDTH y 181))
+(for [y 1 (- GAME_HEIGHT 6)]
+  (map.setTile 2 y 181)
+  (map.setTile (- GAME_WIDTH 1) y 181))
 
 (local characterImage (love.graphics.newImage "assets/astro.png"))
 (local characterGrid (anim8.newGrid 8 8 120 8))
@@ -60,6 +64,7 @@
                :animation walk :image characterImage :alive true})
 
 (world:add player player.x player.y 6 8)
+(world:add {} 0 (- GAME_HEIGHT 8) (+ GAME_WIDTH 8) 8)
 
 (fn killPlayer []
   (set player.image explosionImage)
@@ -136,8 +141,13 @@
       (set player.speed 0)
       (set player.direction (opposite player.direction)))
     (when player.alive 
-      (set player.x actualX)
-      (set player.y actualY))))
+      (if (> player.x (+ GAME_WIDTH 4))
+          (set player.x 4)
+          (< player.x 4)
+          (set player.x (+ GAME_WIDTH 4))
+          (do 
+            (set player.x actualX)
+            (set player.y actualY))))))
 
 (fn love.update [dt]
   (let [x (player.direction player.x (* player.speed dt))
@@ -152,7 +162,7 @@
         (set player.jumpTimer 0)))
     (move-player x y))
   (cam:update dt)
-  (cam:follow (/ WIDTH 2) player.y)
+  (cam:follow (+ (/ WIDTH 2)) player.y)
   (player.animation:update dt))
 
 (fn love.keypressed [key]
@@ -160,8 +170,8 @@
       (love.event.quit)
       (= "space" key)
       (jumpPlayer)
-      (= "d" key)
-      (killPlayer)
+      (= "i" key)
+      (print player.x player.y)
       (= "r" key)
       (love.event.quit "restart")))
 

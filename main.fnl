@@ -17,31 +17,33 @@
 ; shift the camera bound up one tile, and shrink it one tile
 (cam:setBounds 8 0 (- WIDTH 8) (* GAME_HEIGHT 8))
 
-(global world (bump.newWorld 8))
-(world:add player player.x player.y 6 8)
-
-(local map (require :map))
-(map.init)
-
 (global tileSheet (love.graphics.newImage "assets/tiles.png"))
 (global tileAtlas {})
 (for [i 0 19]
   (for [j 0 19]
     (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
 
-(for [x 1  GAME_WIDTH]
-  (map.setTile x GAME_HEIGHT 181))
-(for [y 1 (- GAME_HEIGHT 6)]
-  (map.setTile 2 y 181)
-  (map.setTile (- GAME_WIDTH 1) y 181))
+(local map (require :map))
+(local lava {:death true :x 8 :y (* GAME_HEIGHT 8)})
+(fn love.load []
+  (global world (bump.newWorld 8))
+  (world:add player player.x player.y 6 8)
+  (map.init)
+  (for [x 1  GAME_WIDTH]
+    (map.setTile x GAME_HEIGHT 181))
+  (for [y 1 (- GAME_HEIGHT 6)]
+    (map.setTile 2 y 181)
+    (map.setTile (- GAME_WIDTH 1) y 181))
+  (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT 8))
+  (map.setTile 10 28 181)
+  (map.setTile 5 25 181)
+  (map.setTile 9 28 211)
+  (map.setTile 6 25 210))
 
-(map.setTile 10 28 181)
-(map.setTile 5 25 181)
-(map.setTile 9 28 211)
-(map.setTile 6 25 210)
 
 (fn love.update [dt]
   (player.update dt)
+  (util.updateObject lava lava.x (- lava.y 0.1))
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) player.y))
 
@@ -57,6 +59,7 @@
 
 (fn draw []
   (map.draw)
+  (love.graphics.rectangle "fill" lava.x lava.y WIDTH (* GAME_HEIGHT 8))
   (let [right (= player.direction util.add)
         dead (not player.alive)
         orientation (if right 1 -1)

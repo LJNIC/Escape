@@ -87,11 +87,6 @@
         (player.normalJump)
         (set player.gravity -100))))
 
-(fn player.updateCollider [x y]
-  (set player.x x)
-  (set player.y y)
-  (world:update player player.x player.y))
-
 (fn player.move [x y]
   (let [(actualX actualY cols len) (world:move player x y)]
     (each [index col (pairs cols)]
@@ -111,9 +106,9 @@
       (set player.direction (util.opposite player.direction)))
     (when player.alive 
       (if (> player.x (+ WIDTH 4))
-          (player.updateCollider 4 player.y)
+          (util.updateObject player 4 player.y)
           (< player.x 4)
-          (player.updateCollider (+ WIDTH 4) player.y)
+          (util.updateObject player (+ WIDTH 4) player.y)
           (do 
             (set player.x actualX)
             (set player.y actualY))))))

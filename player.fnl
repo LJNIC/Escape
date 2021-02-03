@@ -24,7 +24,7 @@
 ; animation  - which animation to draw (walk, die, jump, etc)
 ; image      - the corresponding image for the animation
 ; alive      - whether the player is dead or alive
-(local player {:x 16 :y 240 :speed SPEED :direction util.add :jumping false :jumpTimer 0
+(local player {:x 16 :y 241 :speed SPEED :direction util.add :jumping false :jumpTimer 0
                :hasJump false :onWall false :onGround true :gravity 0 :weight WEIGHT
                :animation walk :image characterImage :alive true})
 
@@ -75,6 +75,11 @@
       (do 
         (set player.gravity 25))))
 
+(fn player.conveyor [col]
+  (player.handleGround col)
+  (when (or (= col.normal.x -1) (= col.normal.x 1))
+    (set player.gravity (col.other.direction 0 20))))
+
 (fn player.bounce [col]
   (if (= col.normal.y 1) 
       (player.handleGround col)
@@ -96,7 +101,9 @@
         col.other.death
         (player.kill)
         col.other.bounce
-        (player.bounce col)))
+        (player.bounce col)
+        col.other.conveyor
+        (player.conveyor col)))
     ; we fell off a wall
     (when (and (= len 0) player.onWall)
       (set player.onWall false)
@@ -118,7 +125,7 @@
         y (+ player.y (* player.gravity dt))]
     (if (and player.jumping (love.keyboard.isDown "space") (< player.jumpTimer 0.3)) 
       (do 
-        (set player.gravity (+ player.gravity 2))
+        (set player.gravity (+ player.gravity (* 120 dt)))
         (set player.jumpTimer (+ player.jumpTimer dt)))
       (do 
         (set player.gravity (+ player.gravity (* player.weight dt)))

@@ -5,15 +5,23 @@
 
 ; TODO find better way to handle tiles
 (local tileTypes 
-  {:lava {:action :death :width 8 :height 8 :offX 0 :offY 0}
+  {:death {:action :death :width 8 :height 8 :offX 0 :offY 0}
+   :laser {:action :death :width 4 :height 8 :offX 2 :offY 0}
    :ground {:action :ground :width 8 :height 8 :offX 0 :offY 0}
    :bounce {:action :bounce :width 4 :height 8 :offX 4 :offY 0 :direction util.sub}
-   :bounce-l {:action :bounce :width 4 :height 8 :offX 0 :offY 0 :direction util.add}})
+   :bounceLeft {:action :bounce :width 4 :height 8 :offX 0 :offY 0 :direction util.add}
+   :conveyorDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub}
+   :conveyorUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add}})
 (local tileFunctions 
-  {389 (. tileTypes :lava) 
-   181 (. tileTypes :ground) 
-   211 (. tileTypes :bounce)
-   210 (. tileTypes :bounce-l)})
+  {389 tileTypes.death
+   393 tileTypes.laser
+   374 tileTypes.laser
+   376 tileTypes.laser
+   201 tileTypes.ground
+   211 tileTypes.bounce
+   210 tileTypes.bounceLeft
+   1 tileTypes.conveyorDown
+   2 tileTypes.conveyorUp})
 
 (fn getTile [tileId] (. tileFunctions tileId))
 

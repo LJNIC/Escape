@@ -4,6 +4,7 @@
 (local camera (require :lib/camera))
 (local util (require :util))
 (local player (require :player))
+(local level (require :level))
 
 ; game width is 2 tiles wider than we actually render
 (global [GAME_WIDTH GAME_HEIGHT] [14 32])
@@ -27,23 +28,18 @@
 (local lava {:death true :x 8 :y (* GAME_HEIGHT 8)})
 (fn love.load []
   (global world (bump.newWorld 8))
-  (world:add player player.x player.y 6 8)
+  (world:add player player.x player.y 6 7)
   (map.init)
-  (for [x 1  GAME_WIDTH]
-    (map.setTile x GAME_HEIGHT 181))
-  (for [y 1 (- GAME_HEIGHT 6)]
-    (map.setTile 2 y 181)
-    (map.setTile (- GAME_WIDTH 1) y 181))
-  (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT 8))
-  (map.setTile 10 28 181)
-  (map.setTile 5 25 181)
-  (map.setTile 9 28 211)
-  (map.setTile 6 25 210))
-
+  (for [x 1 GAME_WIDTH]
+    (for [y 1 GAME_HEIGHT]
+      (let [tile (. (. level y) x)]
+        (when (not= tile 0)
+          (map.setTile x y tile)))))
+  (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT 8)))
 
 (fn love.update [dt]
   (player.update dt)
-  (util.updateObject lava lava.x (- lava.y 0.1))
+  (util.updateObject lava lava.x (- lava.y (* 5 dt)))
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) player.y))
 
@@ -52,8 +48,6 @@
       (love.event.quit)
       (= "space" key)
       (player.jump)
-      (= "i" key)
-      (print player.x player.y player.gravity)
       (= "r" key)
       (love.event.quit "restart")))
 
@@ -64,7 +58,7 @@
         dead (not player.alive)
         orientation (if right 1 -1)
         ox (if right (if dead 4 0) (if dead 12 6))]
-    (player.animation:draw player.image player.x player.y 0 orientation 1 ox (if dead 4 0))))
+    (player.animation:draw player.image player.x (- player.y 1) 0 orientation 1 ox (if dead 4 0))))
 
 (fn love.draw []
   (push:start)

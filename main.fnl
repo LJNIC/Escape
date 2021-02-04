@@ -39,6 +39,7 @@
 
 (fn love.update [dt]
   (player.update dt)
+  (map.update dt)
   (util.updateObject lava lava.x (- lava.y (* 5 dt)))
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) player.y))

@@ -8,9 +8,9 @@
 (local conveyorTopUp (anim8.newAnimation (tilesetGrid "18-20" 14) 0.1))
 (local conveyorMidUp (anim8.newAnimation (tilesetGrid "18-20" 15) 0.1))
 (local conveyorBottomUp (anim8.newAnimation (tilesetGrid "18-20" 16) 0.1))
-(local conveyorTopDown (anim8.newAnimation (tilesetGrid "18-20" 14) 0.1))
-(local conveyorMidDown (anim8.newAnimation (tilesetGrid "18-20" 14) 0.1))
-(local conveyorBottomDown (anim8.newAnimation (tilesetGrid "18-20" 14) 0.1))
+(local conveyorTopDown (anim8.newAnimation (tilesetGrid "20-18" 14) 0.1))
+(local conveyorMidDown (anim8.newAnimation (tilesetGrid "20-18" 15) 0.1))
+(local conveyorBottomDown (anim8.newAnimation (tilesetGrid "20-18" 16) 0.1))
 
 ; TODO find better way to handle tiles
 (local tileTypes 
@@ -19,9 +19,9 @@
    :ground {:action :ground :width 8 :height 8 :offX 0 :offY 0}
    :bounce {:action :bounce :width 4 :height 8 :offX 4 :offY 0 :direction util.sub}
    :bounceLeft {:action :bounce :width 4 :height 8 :offX 0 :offY 0 :direction util.add}
-   :conveyorTopDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add}
-   :conveyorMidDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add}
-   :conveyorBottomDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add}
+   :conveyorTopDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add :animation conveyorTopDown}
+   :conveyorMidDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add :animation conveyorMidDown}
+   :conveyorBottomDown {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.add :animation conveyorBottomDown}
    :conveyorTopUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub :animation conveyorTopUp}
    :conveyorMidUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub :animation conveyorMidUp}
    :conveyorBottomUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub :animation conveyorBottomUp}})
@@ -35,7 +35,10 @@
    210 tileTypes.bounceLeft
    298 tileTypes.conveyorMidUp
    318 tileTypes.conveyorBottomUp
-   278 tileTypes.conveyorTopUp})
+   278 tileTypes.conveyorTopUp
+   299 tileTypes.conveyorMidDown
+   319 tileTypes.conveyorBottomDown
+   279 tileTypes.conveyorTopDown})
 
 (fn getTile [tileId] (. tileFunctions tileId))
 

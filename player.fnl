@@ -4,6 +4,8 @@
 (local characterImage (love.graphics.newImage "assets/astro.png"))
 (local characterGrid (anim8.newGrid 8 8 120 8))
 (local walk (anim8.newAnimation (characterGrid "2-7" 1) 0.1))
+(local jump (anim8.newAnimation (characterGrid 5 1) 1000000))
+(local wall (anim8.newAnimation (characterGrid 11 1) 1000000))
 
 (local explosionImage (love.graphics.newImage "assets/explosion2.png"))
 (local explosionGrid (anim8.newGrid 16 16 256 16))
@@ -51,6 +53,7 @@
   (set player.speed SPEED))
 
 (fn player.jump []
+  (set player.animation jump)
   (if (or player.onWall player.hasJump)
       (player.wallJump)
       player.onGround
@@ -60,6 +63,7 @@
   (if (or (= col.normal.x -1) (= col.normal.x 1))
       (do 
         (set player.onWall true)
+        (set player.animation wall)
         (set player.weight 1)
         (set player.gravity 10)
         (set player.hasJump true))
@@ -69,6 +73,7 @@
         (set player.gravity 0)
         (set player.onGround true)
         (set player.speed SPEED)
+        (when (not player.onWall) (set player.animation walk))
         (set player.hasJump false))
       ; we hit a ceiling
       (= col.normal.y 1)
@@ -121,7 +126,7 @@
             (set player.y actualY))))))
 
 (fn player.update [dt]
-  (let [x (player.direction player.x (* player.speed dt))
+  (when player.alive (let [x (player.direction player.x (* player.speed dt))
         y (+ player.y (* player.gravity dt))]
     (if (and player.jumping (love.keyboard.isDown "space") (< player.jumpTimer 0.3)) 
       (do 
@@ -131,7 +136,7 @@
         (set player.gravity (+ player.gravity (* player.weight dt)))
         (set player.jumping false)
         (set player.jumpTimer 0)))
-    (player.move x y))
+    (player.move x y)))
   (player.animation:update dt))
 
 player

@@ -30,7 +30,7 @@
    393 tileTypes.laser
    374 tileTypes.laser
    376 tileTypes.laser
-   201 tileTypes.ground
+   181 tileTypes.ground
    211 tileTypes.bounce
    210 tileTypes.bounceLeft
    298 tileTypes.conveyorMidUp
@@ -46,7 +46,7 @@
   (for [x 1 GAME_WIDTH]
     (table.insert tiles [])
     (for [y 1 GAME_HEIGHT]
-      (table.insert (. tiles x) 341))))
+      (table.insert (. tiles x) 400))))
 
 (fn map.setTile [x y tile]
   (tset (. tiles x) y tile)

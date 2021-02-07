@@ -2,7 +2,7 @@
 (local anim8 (require :lib/anim8))
 
 (local map {})
-(local tiles {})
+(var tiles {})
 
 (local tilesetGrid (anim8.newGrid 8 8 160 160))
 (local conveyorTopUp (anim8.newAnimation (tilesetGrid "18-20" 14) 0.1))
@@ -14,8 +14,7 @@
 
 ; TODO find better way to handle tiles
 (local tileTypes 
-  {:death {:action :death :width 8 :height 8 :offX 0 :offY 0}
-   :laser {:action :death :width 4 :height 8 :offX 2 :offY 0}
+  {:laser {:action :death :width 4 :height 8 :offX 2 :offY 0}
    :ground {:action :ground :width 8 :height 8 :offX 0 :offY 0}
    :bounce {:action :bounce :width 4 :height 8 :offX 4 :offY 0 :direction util.sub}
    :bounceLeft {:action :bounce :width 4 :height 8 :offX 0 :offY 0 :direction util.add}
@@ -26,8 +25,7 @@
    :conveyorMidUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub :animation conveyorMidUp}
    :conveyorBottomUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub :animation conveyorBottomUp}})
 (local tileFunctions 
-  {389 tileTypes.death
-   393 tileTypes.laser
+  {393 tileTypes.laser
    374 tileTypes.laser
    376 tileTypes.laser
    181 tileTypes.ground
@@ -47,6 +45,15 @@
     (table.insert tiles [])
     (for [y 1 GAME_HEIGHT]
       (table.insert (. tiles x) 400))))
+
+(fn map.loadMap [newMap]
+  (for [x 1 GAME_WIDTH]
+    (for [y 1 GAME_HEIGHT]
+      (let [id (. (. newMap x) y)
+            type (getTile id)]
+        (if (= nil type)
+          (tset (. tiles x) y id)
+          (map.setTile x y id))))))
 
 (fn map.setTile [x y tile]
   (tset (. tiles x) y tile)

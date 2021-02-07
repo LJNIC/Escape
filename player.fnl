@@ -5,6 +5,7 @@
 (local characterGrid (anim8.newGrid 8 8 120 8))
 (local walk (anim8.newAnimation (characterGrid "2-7" 1) 0.1))
 (local jump (anim8.newAnimation (characterGrid 5 1) 1000000))
+(local fall (anim8.newAnimation (characterGrid 9 1) 10000))
 (local wall (anim8.newAnimation (characterGrid 11 1) 1000000))
 
 (local explosionImage (love.graphics.newImage "assets/explosion2.png"))
@@ -86,6 +87,8 @@
     (set player.gravity (col.other.direction 0 20))))
 
 (fn player.bounce [col]
+  (set player.speed SPEED)
+  (set player.animation jump)
   (if (= col.normal.y 1) 
       (player.handleGround col)
       player.onWall
@@ -97,20 +100,24 @@
         (player.normalJump)
         (set player.gravity -100))))
 
+(fn doNothing [] (+ 0 0))
+
 (fn player.move [x y]
   (let [(actualX actualY cols len) (world:move player x y)]
     (each [index col (pairs cols)]
-      (if 
-        col.other.ground 
-        (player.handleGround col)
-        col.other.death
-        (player.kill)
-        col.other.bounce
-        (player.bounce col)
-        col.other.conveyor
-        (player.conveyor col)))
+      (if (not player.alive)
+          (doNothing)
+          col.other.death
+          (player.kill)
+          col.other.ground 
+          (player.handleGround col)
+          col.other.bounce
+          (player.bounce col)
+          col.other.conveyor
+          (player.conveyor col)))
     ; we fell off a wall
     (when (and (= len 0) player.onWall)
+      (set player.animation fall)
       (set player.onWall false)
       (set player.gravity 50)
       (set player.weight WEIGHT)
@@ -130,7 +137,7 @@
         y (+ player.y (* player.gravity dt))]
     (if (and player.jumping (love.keyboard.isDown "space") (< player.jumpTimer 0.3)) 
       (do 
-        (set player.gravity (+ player.gravity (* 120 dt)))
+        (set player.gravity (+ player.gravity (* 150 dt)))
         (set player.jumpTimer (+ player.jumpTimer dt)))
       (do 
         (set player.gravity (+ player.gravity (* player.weight dt)))

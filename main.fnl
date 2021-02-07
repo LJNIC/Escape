@@ -32,16 +32,11 @@
 (local lavaImage (love.graphics.newImage "assets/lava.png"))
 (lavaImage:setWrap "repeat")
 
-(fn love.load []
-  (global world (bump.newWorld TILE_WIDTH))
-  (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
-  (map.init)
-  (for [x 1 GAME_WIDTH]
-    (for [y 1 GAME_HEIGHT]
-      (let [tile (. (. level y) x)]
-        (when (not= tile 0)
-          (map.setTile x y tile)))))
-  (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH)))
+(global world (bump.newWorld TILE_WIDTH))
+(world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
+(map.init)
+(map.loadMap (util.loadMap "assets/level.png"))
+(world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH))
 
 (fn love.update [dt]
   (player.update dt)

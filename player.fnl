@@ -1,5 +1,6 @@
 (local util (require :util))
 (local anim8 (require :lib/anim8))
+(local audio (require :audio))
 
 (local characterImage (love.graphics.newImage "assets/astro.png"))
 (local characterGrid (anim8.newGrid 8 8 120 8))
@@ -13,14 +14,14 @@
 (local die (anim8.newAnimation (explosionGrid "6-16" 1) 0.1 "pauseAtEnd"))
 
 (local SPEED 40)
-(local WEIGHT 456)
+(local WEIGHT 600)
 (local JUMP_GRAVITY -80)
 ; speed      - horizontal speed
 ; direction  - a function that either adds or subtracts to the player's X position
 ; jumping    - whether the player is in the process of jumping (input)
 ; jumpTimer  - how long player has been holding jump
 ; hasJump    - whether the player can double jump
-; onWall     - whether the player is hanging on a wall
+; onWall     - whether the player is hanging on a wall/
 ; onGround   - whether the player is on the ground
 ; gravity    - multiplier for pulling player down
 ; weight     - multiplier for gravity
@@ -32,6 +33,7 @@
                :animation walk :image characterImage :alive true})
 
 (fn player.kill []
+  (audio.play :die)
   (set player.image explosionImage)
   (set player.animation die)
   (set player.alive false))
@@ -43,8 +45,9 @@
   (set player.hasJump true))
 
 (fn player.wallJump []
-  (when (not player.onWall)
-    (set player.hasJump false))
+  (if (not player.onWall)
+      (set player.hasJump false)
+      (set player.hasJump true))
   (set player.jumping true)
   (set player.direction (util.opposite player.direction))
   (set player.gravity JUMP_GRAVITY)
@@ -56,9 +59,9 @@
 (fn player.jump []
   (set player.animation jump)
   (if (or player.onWall player.hasJump)
-      (player.wallJump)
+      (do (audio.play :jump) (player.wallJump))
       player.onGround
-      (player.normalJump)))
+      (do (audio.play :jump) (player.normalJump))))
 
 (fn player.handleGround [col]
   (if (or (= col.normal.x -1) (= col.normal.x 1))
@@ -89,13 +92,15 @@
 (fn player.bounce [col]
   (set player.speed SPEED)
   (set player.animation jump)
-  (if (= col.normal.y 1) 
+  (if (or (= col.normal.y 1) (= col.normal.y -1))
       (player.handleGround col)
       player.onWall
       (do
+        (audio.play :bounce)
         (player.wallJump) 
         (set player.gravity -100))
       (do 
+        (audio.play :bounce)
         (set player.direction col.other.direction)
         (player.normalJump)
         (set player.gravity -100))))
@@ -140,7 +145,7 @@
         (set player.gravity (+ player.gravity (* 150 dt)))
         (set player.jumpTimer (+ player.jumpTimer dt)))
       (do 
-        (set player.gravity (+ player.gravity (* player.weight dt)))
+        (if (< player.gravity 200) (set player.gravity (+ player.gravity (* player.weight dt))))
         (set player.jumping false)
         (set player.jumpTimer 0)))
     (player.move x y)))

@@ -10,7 +10,7 @@
   (set object.y y)
   (world:update object x y))
 
-(local colors {[0 0 1] 181 [1 0 0] 211 [0 1 0] 210})
+(local colors {[0 0 1] 181 [1 0 0] 211 [0 1 0] 210 [1 1 0] 299 [0 1 1] 393 [1 0 1] 341})
 
 (fn getTile [red green blue]
   (var id 400)

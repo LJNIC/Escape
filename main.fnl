@@ -43,7 +43,7 @@
   (map.update dt)
   (set lavaViewport.x (+ lavaViewport.x (* dt 25)))
   (lavaQuad:setViewport lavaViewport.x 0 WIDTH (* GAME_HEIGHT TILE_WIDTH))
-  (util.updateObject lava lava.x (- lava.y (* 10 dt)))
+  ;(util.updateObject lava lava.x (- lava.y (* 10 dt)))
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 

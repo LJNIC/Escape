@@ -15,6 +15,7 @@
 ; TODO find better way to handle tiles
 (local tileTypes 
   {:laser {:action :death :width 4 :height 8 :offX 2 :offY 0}
+   :laserH {:action :death :width 8 :height 4 :offX 0 :offY 2}
    :ground {:action :ground :width 8 :height 8 :offX 0 :offY 0}
    :bounce {:action :bounce :width 4 :height 8 :offX 4 :offY 0 :direction util.sub}
    :bounceLeft {:action :bounce :width 4 :height 8 :offX 0 :offY 0 :direction util.add}
@@ -26,9 +27,14 @@
    :conveyorBottomUp {:action :conveyor :width 8 :height 8 :offX 0 :offY 0 :direction util.sub :animation conveyorBottomUp}})
 (local tileFunctions 
   {393 tileTypes.laser
+   395 tileTypes.laserH
    374 tileTypes.laser
    376 tileTypes.laser
-   181 tileTypes.ground
+   244 tileTypes.ground
+   245 tileTypes.ground
+   246 tileTypes.ground
+   243 tileTypes.ground
+   242 tileTypes.ground
    211 tileTypes.bounce
    210 tileTypes.bounceLeft
    298 tileTypes.conveyorMidUp

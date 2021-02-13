@@ -1,3 +1,4 @@
+(local mathx (require :lib/mathx))
 (local util {})
 
 (fn util.add [a b] (+ a b))
@@ -10,13 +11,13 @@
   (set object.y y)
   (world:update object x y))
 
-(local colors {[0 0 1] 181 [1 0 0] 211 [0 1 0] 210 [1 1 0] 299 [0 1 1] 393 [1 0 1] 341})
+(local colors {[0 0 1] 246 [1 0 0] 211 [0 1 0] 210 [1 1 0] 299 [0 1 1] 393 [1 0 1] 341 [1 1 1] 395 [0 0.5 0.5] 245})
 
 (fn getTile [red green blue]
   (var id 400)
   (each [c tile (pairs colors)]
     (let [[r g b] c]
-      (when (and (= red r) (= green g) (= blue b))
+      (when (and (= (mathx.precision red 1) r) (= (mathx.precision green 1) g) (= (mathx.precision blue 1) b))
         (set id tile))))
   id)
 

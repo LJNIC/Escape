@@ -1,10 +1,11 @@
-(local bump (require :lib/bump))
-(local anim8 (require :lib/anim8))
-(local push (require :lib/push))
-(local camera (require :lib/camera))
+(local bump (require :lib.bump))
+(local anim8 (require :lib.anim8))
+(local push (require :lib.push))
+(local camera (require :lib.camera))
 (local util (require :util))
 (local player (require :player))
 (local level (require :level))
+(let [batteries (require :lib.batteries)] (batteries:export))
 
 ; game width is 2 tiles wider than we actually render
 (global [GAME_WIDTH GAME_HEIGHT] [14 32])
@@ -26,7 +27,7 @@
     (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
 
 (local map (require :map))
-(local lava {:death true :x 8 :y (+ 8 (* GAME_HEIGHT TILE_WIDTH))})
+(local lava {:moving false :death true :x 8 :y (+ 8 (* GAME_HEIGHT TILE_WIDTH))})
 (local lavaViewport {:x 0 :y 0})
 (local lavaQuad (love.graphics.newQuad 0 0 WIDTH HEIGHT WIDTH (* GAME_HEIGHT TILE_WIDTH)))
 (local lavaImage (love.graphics.newImage "assets/lava.png"))
@@ -35,7 +36,7 @@
 (global world (bump.newWorld TILE_WIDTH))
 (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
 (map.init)
-(map.loadMap (util.loadMap "assets/level3.png"))
+(map.loadMap (util.loadMap "assets/level5.png"))
 (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH))
 
 (fn love.update [dt]
@@ -43,7 +44,7 @@
   (map.update dt)
   (set lavaViewport.x (+ lavaViewport.x (* dt 25)))
   (lavaQuad:setViewport lavaViewport.x 0 WIDTH (* GAME_HEIGHT TILE_WIDTH))
-  (if (>= lava.y 0) (util.updateObject lava lava.x (- lava.y (* 10 dt))))
+  (if (and lava.moving (>= lava.y 0)) (util.updateObject lava lava.x (- lava.y (* 10 dt))))
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
@@ -51,7 +52,7 @@
   (if (= "escape" key) 
       (love.event.quit)
       (and (= "space" key) player.alive)
-      (player.jump)
+      (do (player.jump) (set lava.moving true))
       (= "r" key)
       (love.event.quit "restart")))
 

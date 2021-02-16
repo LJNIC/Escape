@@ -1,4 +1,3 @@
-(local mathx (require :lib/mathx))
 (local util {})
 
 (fn util.add [a b] (+ a b))

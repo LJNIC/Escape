@@ -36,7 +36,15 @@
 (global world (bump.newWorld TILE_WIDTH))
 (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
 (map.init)
-(map.loadMap (util.loadMap "assets/level5.png"))
+
+; load level id from file
+(var level 0)
+(when (not (love.filesystem.getInfo "level.txt"))
+  (love.filesystem.newFile "level.txt" "r")
+  (love.filesystem.write "level.txt" "1"))
+(let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
+
+(map.loadMap (util.loadMap (.. "assets/level" level ".png")))
 (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH))
 
 (fn love.update [dt]
@@ -48,11 +56,17 @@
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
+(fn updateLevel []
+  (love.filesystem.write "level.txt" (tostring (mathx.wrap (+ level 1) 1 6)))
+  (love.event.quit "restart"))
+
 (fn love.keypressed [key]
   (if (= "escape" key) 
       (love.event.quit)
       (and (= "space" key) player.alive)
       (do (player.jump) (set lava.moving true))
+      (= "n" key)
+      (do (updateLevel) (love.event.quit "restart"))
       (= "r" key)
       (love.event.quit "restart")))
 

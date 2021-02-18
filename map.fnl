@@ -53,6 +53,7 @@
       (table.insert (. tiles x) 400))))
 
 (fn map.loadMap [newMap]
+  "Loads a new map into the game world"
   (for [x 1 GAME_WIDTH]
     (for [y 1 GAME_HEIGHT]
       (let [id (. (. newMap x) y)
@@ -62,6 +63,7 @@
           (map.setTile x y id))))))
 
 (fn map.setTile [x y tile]
+  "Sets a tile in the game world"
   (tset (. tiles x) y tile)
   (let [type (getTile tile)
         {: width : height : offX : offY : action : direction} type

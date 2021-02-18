@@ -66,7 +66,7 @@
       (and (= "space" key) player.alive)
       (do (player.jump) (set lava.moving true))
       (= "n" key)
-      (do (updateLevel) (love.event.quit "restart"))
+      (updateLevel)
       (= "r" key)
       (love.event.quit "restart")))
 

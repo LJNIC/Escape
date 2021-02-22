@@ -10,7 +10,7 @@
   (set object.y y)
   (world:update object x y))
 
-(local colors {[0 0 1] 246 [1 0 0] 211 [0 1 0] 210 [1 1 0] 299 [0 1 1] 393 [1 0 1] 341 [1 1 1] 395 [0 0.5 0.5] 245})
+(local colors {[0 0 1] 246 [1 0 0] 211 [0 1 0] 210 [1 1 0] 299 [0 1 1] 393 [1 0 1] 341 [1 1 1] 395})
 
 (fn getTile [red green blue]
   "Returns a tile id based on the RGB value"
@@ -24,11 +24,13 @@
 (fn util.loadMap [path]
   "Loads an image-level into a table and returns it"
   (let [image (love.image.newImageData path)
-        newMap {}]
-    (for [x 0 (- (image:getWidth) 1)]
+        newMap {}
+        width (image:getWidth)
+        height (image:getHeight)]
+    (for [x 1 width]
       (table.insert newMap [])
-      (for [y 0 (- (image:getHeight) 1)]
-        (table.insert (. newMap (+ 1 x))  400)))
+      (for [y 1 height]
+        (table.insert (. newMap  x) 400)))
     (image:mapPixel 
       (fn [x y r g b a] 
         (let [tile (getTile r g b)]

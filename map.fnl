@@ -28,6 +28,8 @@
 (local tileFunctions 
   {393 tileTypes.laser
    395 tileTypes.laserH
+   395 tileTypes.laserH
+   395 tileTypes.laserH
    374 tileTypes.laser
    376 tileTypes.laser
    244 tileTypes.ground
@@ -35,6 +37,7 @@
    246 tileTypes.ground
    243 tileTypes.ground
    242 tileTypes.ground
+   241 tileTypes.ground
    211 tileTypes.bounce
    210 tileTypes.bounceLeft
    298 tileTypes.conveyorMidUp
@@ -52,11 +55,37 @@
     (for [y 1 GAME_HEIGHT]
       (table.insert (. tiles x) 400))))
 
-(fn map.loadMap [newMap]
+(local autoTiles 
+;                     0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+  {tileTypes.ground [241 242 242 242 242 246 242 242 242 242 245 242 242 242 242 242]
+   tileTypes.laser  [393 374 393 393 376 393 393 393 393 393 393 393 393 393 393 393]
+   tileTypes.laserH [395 395 380 395 395 395 395 395 379 395 395 395 395 395 395 395]})
+
+(fn getTileAt [map x y]
+  (getTile (. (. map x) y)))
+
+(fn sumTile [m width height x y]
+  (let [sum 0
+        tile (getTileAt m x y)]
+    (-> sum
+      (+ (if (and (> x 1) (= tile (getTileAt m (- x 1) y))) 8 0))
+      (+ (if (and (< x width) (= tile (getTileAt m (+ 1 x) y))) 2 0))
+      (+ (if (and (> y 1) (= tile (getTileAt m x (+ 1 y)))) 4 0))
+      (+ (if (and (< y height) (= tile (getTileAt m x (- y 1)))) 1 0)))))
+
+(fn autoTile [m width height x y]
+  (let [type (getTileAt m x y)
+        autoType (. autoTiles type)]
+    (if autoType
+      (let [bitmask (+ 1 (sumTile m width height x y))]
+        (. autoType bitmask))
+      (. (. m x) y))))
+
+(fn map.loadMap [newMap width height]
   "Loads a new map into the game world"
-  (for [x 1 GAME_WIDTH]
-    (for [y 1 GAME_HEIGHT]
-      (let [id (. (. newMap x) y)
+  (for [x 1 width]
+    (for [y 1 height]
+      (let [id (autoTile newMap width height x y)
             type (getTile id)]
         (if (= nil type)
           (tset (. tiles x) y id)

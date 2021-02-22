@@ -44,7 +44,7 @@
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(map.loadMap (util.loadMap (.. "assets/level" level ".png")))
+(map.loadMap (util.loadMap (.. "assets/level" level ".png")) 14 32)
 (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH))
 
 (fn love.update [dt]
@@ -57,7 +57,7 @@
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
 (fn updateLevel []
-  (love.filesystem.write "level.txt" (tostring (mathx.wrap (+ level 1) 1 6)))
+  (love.filesystem.write "level.txt" (tostring (mathx.wrap (+ level 1) 1 9)))
   (love.event.quit "restart"))
 
 (fn love.keypressed [key]

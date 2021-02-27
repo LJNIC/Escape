@@ -37,6 +37,7 @@
    246 tileTypes.ground
    243 tileTypes.ground
    242 tileTypes.ground
+   8 tileTypes.ground
    241 tileTypes.ground
    211 tileTypes.bounce
    210 tileTypes.bounceLeft
@@ -55,11 +56,16 @@
     (for [y 1 GAME_HEIGHT]
       (table.insert (. tiles x) 400))))
 
+;   1
+;8 [ ] 2
+;   4
 (local autoTiles 
-;                     0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
-  {tileTypes.ground [241 242 242 242 242 246 242 242 242 242 245 242 242 242 242 242]
-   tileTypes.laser  [393 374 393 393 376 393 393 393 393 393 393 393 393 393 393 393]
-   tileTypes.laserH [395 395 380 395 395 395 395 395 379 395 395 395 395 395 395 395]})
+;                              0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+  {tileTypes.ground          [241 242 242 242 242 246 242 246 242 242 245 245 242 246 245 8]
+   tileTypes.laser           [393 374 393 393 376 393 393 393 393 393 393 393 393 393 393 393]
+   tileTypes.laserH          [395 395 380 395 395 395 395 395 379 395 395 395 395 395 395 395]
+   tileTypes.conveyorMidUp   [298 318 298 298 278 298 298 298 298 298 298 298 298 298 298 298]
+   tileTypes.conveyorMidDown [299 319 299 299 279 299 299 299 299 299 299 299 299 299 299 299]})
 
 (fn getTileAt [map x y]
   (getTile (. (. map x) y)))
@@ -104,6 +110,7 @@
       (world:add {action true :direction direction} realX realY width height))))
 
 (fn map.update [dt]
+  "Updates all of the animations in the map"
   (conveyorBottomDown:update dt)
   (conveyorBottomUp:update dt)
   (conveyorTopDown:update dt)
@@ -112,6 +119,7 @@
   (conveyorMidUp:update dt))
 
 (fn map.draw []
+  "Draws the map; the camera handles drawing the appropriate area"
   (for [x 1 GAME_WIDTH]
     (for [y 1 GAME_HEIGHT]
       (let [tile (. (. tiles x) y)

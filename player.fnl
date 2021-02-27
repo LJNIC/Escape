@@ -86,8 +86,10 @@
 
 (fn player.conveyor [col]
   (player.handleGround col)
-  (when (or (= col.normal.x -1) (= col.normal.x 1))
-    (set player.gravity (col.other.direction 0 20))))
+  (if (= col.normal.x -1) 
+      (set player.gravity (col.other.direction 0 20))
+      (= col.normal.x 1)
+      (set player.gravity (col.other.direction 0 -20))))
 
 (fn player.bounce [col]
   (set player.speed SPEED)

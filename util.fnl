@@ -10,7 +10,7 @@
   (set object.y y)
   (world:update object x y))
 
-(local colors {[0 0 1] 246 [1 0 0] 211 [0 1 0] 210 [1 1 0] 299 [0 1 1] 393 [1 0 1] 341 [1 1 1] 395})
+(local colors {[0 0 1] 246 [1 0 0] 211 [0 1 0] 210 [1 1 0] 298 [0 1 1] 393 [1 0 1] 299 [1 1 1] 395})
 
 (fn getTile [red green blue]
   "Returns a tile id based on the RGB value"

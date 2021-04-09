@@ -28,7 +28,7 @@
 ; animation  - which animation to draw (walk, die, jump, etc)
 ; image      - the corresponding image for the animation
 ; alive      - whether the player is dead or alive
-(local player {:x 16 :y 241 :speed SPEED :direction util.add :jumping false :jumpTimer 0
+(local player {:x 16 :y (- (* GAME_HEIGHT TILE_WIDTH) 16) :speed SPEED :direction util.add :jumping false :jumpTimer 0
                :hasJump false :onWall false :onGround true :gravity 0 :weight WEIGHT
                :animation walk :image characterImage :alive true})
 
@@ -58,8 +58,10 @@
 
 (fn player.jump []
   (set player.animation jump)
-  (if (or player.onWall player.hasJump)
+  (if player.onWall
       (do (audio.play :jump) (player.wallJump))
+      player.hasJump
+      (do (set player.jet (audio.play :jet {:loop true})) (player.wallJump))
       player.onGround
       (do (audio.play :jump) (player.normalJump))))
 
@@ -148,6 +150,7 @@
         (set player.jumpTimer (+ player.jumpTimer dt)))
       (do 
         (if (< player.gravity 200) (set player.gravity (+ player.gravity (* player.weight dt))))
+        (when player.jet (player.jet:stop))
         (set player.jumping false)
         (set player.jumpTimer 0)))
     (player.move x y)))

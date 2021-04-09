@@ -3,14 +3,13 @@
 (local push (require :lib.push))
 (local camera (require :lib.camera))
 (local util (require :util))
-(local player (require :player))
-(local level (require :level))
 (let [batteries (require :lib.batteries)] (batteries:export))
 
 ; game width is 2 tiles wider than we actually render
 (global [GAME_WIDTH GAME_HEIGHT] [14 32])
 (global TILE_WIDTH 8)
 (global [WIDTH HEIGHT] [96 128])
+(local player (require :player))
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
 (push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
@@ -29,7 +28,7 @@
 (local map (require :map))
 (local lava {:moving false :death true :x 8 :y (+ 8 (* GAME_HEIGHT TILE_WIDTH))})
 (local lavaViewport {:x 0 :y 0})
-(local lavaQuad (love.graphics.newQuad 0 0 WIDTH HEIGHT WIDTH (* GAME_HEIGHT TILE_WIDTH)))
+(local lavaQuad (love.graphics.newQuad 0 0 WIDTH HEIGHT WIDTH (* 32 TILE_WIDTH)))
 (local lavaImage (love.graphics.newImage "assets/lava.png"))
 (lavaImage:setWrap "repeat")
 
@@ -44,7 +43,7 @@
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(map.loadMap (util.loadMap (.. "assets/level" level ".png")) 14 32)
+(map.loadMap (util.loadMap (.. "assets/level" level ".png")) 14 128)
 (world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH))
 
 (fn love.update [dt]
@@ -57,7 +56,7 @@
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
 (fn updateLevel []
-  (love.filesystem.write "level.txt" (tostring (mathx.wrap (+ level 1) 1 9)))
+  (love.filesystem.write "level.txt" (tostring (mathx.wrap (+ level 1) 1 10)))
   (love.event.quit "restart"))
 
 (fn love.keypressed [key]

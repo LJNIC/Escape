@@ -156,4 +156,11 @@
     (player.move x y)))
   (player.animation:update dt))
 
+(fn player.draw []
+  (let [right (= player.direction util.add)
+        dead (not player.alive)
+        orientation (if right 1 -1)
+        ox (if right (if dead 4 0) (if dead 12 6))]
+    (player.animation:draw player.image (math.floor player.x) (math.floor (- player.y 1)) 0 orientation 1 ox (if dead 4 0))))
+
 player

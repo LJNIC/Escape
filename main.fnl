@@ -10,6 +10,7 @@
 (global TILE_WIDTH 8)
 (global [WIDTH HEIGHT] [96 128])
 (local player (require :player))
+(local lava (require :lava))
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
 (push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
@@ -26,11 +27,6 @@
     (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
 
 (local map (require :map))
-(local lava {:moving false :death true :x 8 :y (+ 8 (* GAME_HEIGHT TILE_WIDTH))})
-(local lavaViewport {:x 0 :y 0})
-(local lavaQuad (love.graphics.newQuad 0 0 WIDTH HEIGHT WIDTH (* 32 TILE_WIDTH)))
-(local lavaImage (love.graphics.newImage "assets/lava.png"))
-(lavaImage:setWrap "repeat")
 
 (global world (bump.newWorld TILE_WIDTH))
 (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
@@ -49,9 +45,7 @@
 (fn love.update [dt]
   (player.update dt)
   (map.update dt)
-  (set lavaViewport.x (+ lavaViewport.x (* dt 25)))
-  (lavaQuad:setViewport lavaViewport.x 0 WIDTH (* GAME_HEIGHT TILE_WIDTH))
-  (if (and lava.moving (>= lava.y 0)) (util.updateObject lava lava.x (- lava.y (* 10 dt))))
+  (lava.update dt)
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
@@ -70,13 +64,9 @@
       (love.event.quit "restart")))
 
 (fn draw []
+  (lava.draw)
   (map.draw)
-  (love.graphics.draw lavaImage lavaQuad lava.x lava.y)
-  (let [right (= player.direction util.add)
-        dead (not player.alive)
-        orientation (if right 1 -1)
-        ox (if right (if dead 4 0) (if dead 12 6))]
-    (player.animation:draw player.image (math.floor player.x) (math.floor (- player.y 1)) 0 orientation 1 ox (if dead 4 0))))
+  (player.draw))
 
 (fn love.draw []
   (push:start)

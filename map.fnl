@@ -103,6 +103,7 @@
   (for [x 1 width]
     (table.insert tiles {})
     (for [y 1 height]
+      (print x y)
       (let [id (autoTile newMap width height x y)
             type (getTile id)]
         (if (= 1 id)

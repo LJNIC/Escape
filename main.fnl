@@ -29,9 +29,12 @@
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(map.loadMap (util.loadMap (.. "assets/level" level ".png")) 14 32 cam)
-(tset player :x (* TILE_WIDTH map.player.x))
-(tset player :y (* TILE_WIDTH map.player.y))
+(local newMap (util.loadMap (.. "assets/level" level ".png")))
+(map.loadMap newMap (length newMap) (length (. newMap 1)) cam)
+(when map.player
+  (tset player :x (* TILE_WIDTH map.player.x))
+  (tset player :y (* TILE_WIDTH map.player.y)))
+(tset lava :y (* TILE_WIDTH map.height))
 (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
 (world:add lava lava.x lava.y WIDTH (* map.height TILE_WIDTH))
 

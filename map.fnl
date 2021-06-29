@@ -48,6 +48,12 @@
    319 tileTypes.conveyorBottomDown
    279 tileTypes.conveyorTopDown})
 
+(local tileSheet (love.graphics.newImage "assets/tiles.png"))
+(local tileAtlas {})
+(for [i 0 19]
+  (for [j 0 19]
+    (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
+
 (fn getTile [tileId] (. tileFunctions tileId))
 
 (fn map.init []
@@ -87,15 +93,25 @@
         (. autoType bitmask))
       (. (. m x) y))))
 
-(fn map.loadMap [newMap width height]
+(fn map.loadMap [newMap width height cam]
   "Loads a new map into the game world"
+  (tset map :width width)
+  (tset map :height height)
+  (set tiles {})
+  ; shift the camera bound up one tile, and shrink it one tile
+  (cam:setBounds TILE_WIDTH 0 (- WIDTH TILE_WIDTH) (* height TILE_WIDTH))
   (for [x 1 width]
+    (table.insert tiles {})
     (for [y 1 height]
       (let [id (autoTile newMap width height x y)
             type (getTile id)]
-        (if (= nil type)
-          (tset (. tiles x) y id)
-          (map.setTile x y id))))))
+        (if (= 1 id)
+            (do 
+              (tset map :player {:x x :y y})
+              (tset (. tiles x) y 400))
+            (= nil type)
+            (tset (. tiles x) y id)
+            (map.setTile x y id))))))
 
 (fn map.setTile [x y tile]
   "Sets a tile in the game world"
@@ -120,8 +136,8 @@
 
 (fn map.draw []
   "Draws the map; the camera handles drawing the appropriate area"
-  (for [x 1 GAME_WIDTH]
-    (for [y 1 GAME_HEIGHT]
+  (for [x 1 map.width]
+    (for [y 1 map.height]
       (let [tile (. (. tiles x) y)
             animation (if (getTile tile) (. (getTile tile) :animation))
             realX (* (- x 1) 8)

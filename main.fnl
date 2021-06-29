@@ -11,25 +11,15 @@
 (global [WIDTH HEIGHT] [96 128])
 (local player (require :player))
 (local lava (require :lava))
+(local map (require :map))
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
 (push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
 
 ; again, we render 2 tiles less than our total width
 (local cam (camera 0 0 (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
-; shift the camera bound up one tile, and shrink it one tile
-(cam:setBounds TILE_WIDTH 0 (- WIDTH TILE_WIDTH) (* GAME_HEIGHT TILE_WIDTH))
-
-(global tileSheet (love.graphics.newImage "assets/tiles.png"))
-(global tileAtlas {})
-(for [i 0 19]
-  (for [j 0 19]
-    (table.insert tileAtlas (love.graphics.newQuad (* j 8) (* i 8) 8 8 160 160))))
-
-(local map (require :map))
 
 (global world (bump.newWorld TILE_WIDTH))
-(world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
 (map.init)
 
 ; load level id from file
@@ -39,8 +29,11 @@
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(map.loadMap (util.loadMap (.. "assets/level" level ".png")) 14 128)
-(world:add lava lava.x lava.y WIDTH (* GAME_HEIGHT TILE_WIDTH))
+(map.loadMap (util.loadMap (.. "assets/level" level ".png")) 14 32 cam)
+(tset player :x (* TILE_WIDTH map.player.x))
+(tset player :y (* TILE_WIDTH map.player.y))
+(world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
+(world:add lava lava.x lava.y WIDTH (* map.height TILE_WIDTH))
 
 (fn love.update [dt]
   (player.update dt)

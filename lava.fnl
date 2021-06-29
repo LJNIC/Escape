@@ -16,11 +16,7 @@
 
 (fn lava.draw [] 
   (love.graphics.draw lava.background 0 lava.y)
-  (lava.animation:draw lava.image 16 lava.y)
-  (lava.animation:draw lava.image 32 lava.y)
-  (lava.animation:draw lava.image 48 lava.y)
-  (lava.animation:draw lava.image 64 lava.y)
-  (lava.animation:draw lava.image 80 lava.y)
-  (lava.animation:draw lava.image 96 lava.y))
+  (for [x 0 128 16]
+    (lava.animation:draw lava.image x lava.y)))
 
 lava

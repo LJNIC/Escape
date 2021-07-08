@@ -26,7 +26,7 @@
   (var id 400)
   (each [c tile (pairs colors)]
     (let [[r g b] c]
-      (when (and (= (mathx.precision red 1) r) (= (mathx.precision green 1) g) (= (mathx.precision blue 1) b))
+      (when (and (= (math.to_precision red 1) r) (= (math.to_precision green 1) g) (= (math.to_precision blue 1) b))
         (set id tile))))
   id)
 

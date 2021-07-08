@@ -11,16 +11,16 @@
 (global [WIDTH HEIGHT] [96 128])
 (local player (require :player))
 (local lava (require :lava))
-(local map (require :map))
+(local tilemap (require :tilemap))
 
 (love.graphics.setDefaultFilter "nearest" "nearest")
 (push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
 
 ; again, we render 2 tiles less than our total width
-(local cam (camera 0 0 (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
+(local cam (camera 0 0  (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
 
 (global world (bump.newWorld TILE_WIDTH))
-(map.init)
+(tilemap.init)
 
 ; load level id from file
 (var level 0)
@@ -30,18 +30,14 @@
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
 (local newMap (util.loadMap (.. "assets/level" level ".png")))
-(map.loadMap newMap (length newMap) (length (. newMap 1)) cam)
-(when map.player
-  (tset player :x (* TILE_WIDTH map.player.x))
-  (tset player :y (* TILE_WIDTH map.player.y)))
-(tset lava :y (* TILE_WIDTH map.height))
-(world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1))
-(world:add lava lava.x lava.y WIDTH (* map.height TILE_WIDTH))
+(tilemap.loadMap newMap (length newMap) (length (. newMap 1)) cam)
+(player.init world tilemap)
+(lava.init world tilemap)
 
 (fn love.update [dt]
   (player.update dt)
-  (map.update dt)
-  (lava.update dt)
+  (tilemap.update dt)
+  ;(lava.update dt)
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
@@ -59,15 +55,14 @@
       (= "r" key)
       (love.event.quit "restart")))
 
-(fn draw []
-  (lava.draw)
-  (map.draw)
-  (player.draw))
-
 (fn love.draw []
   (push:start)
   (cam:attach)
-  (draw)
+
+  (lava.draw)
+  (tilemap.draw)
+  (player.draw)
+
   (cam:detach)
   (push:finish))
   

@@ -16,13 +16,13 @@ file_names = []
 for subdir, dirs, files in os.walk("."):
     for file in files:
         if ".fnl" in file:
-            file_path = Path(file)
-            file_names.append(file_path.with_suffix(".lua"))
-            file_name = file_path.stem
-            os.system(f"fennel --compile {file} > {file_name}.lua")
+            file_path = Path(os.path.join(subdir, file))
+            lua_file_path = file_path.with_suffix(".lua")
+            file_names.append(lua_file_path)
+            os.system(f"fennel --compile {file_path} > {lua_file_path}")
 
 if run_love:
-    os.system("love .")
+    os.system("love source/")
 
 if delete:
     for file_name in file_names:

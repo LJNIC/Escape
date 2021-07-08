@@ -1,7 +1,7 @@
 (local util (require :util))
 (local anim8 (require :lib/anim8))
 
-(local map {})
+(local tilemap {})
 (var tiles {})
 
 (local tilesetGrid (anim8.newGrid 8 8 160 160))
@@ -56,7 +56,7 @@
 
 (fn getTile [tileId] (. tileFunctions tileId))
 
-(fn map.init []
+(fn tilemap.init []
   (for [x 1 GAME_WIDTH]
     (table.insert tiles [])
     (for [y 1 GAME_HEIGHT]
@@ -73,8 +73,8 @@
    tileTypes.conveyorMidUp   [298 318 298 298 278 298 298 298 298 298 298 298 298 298 298 298]
    tileTypes.conveyorMidDown [299 319 299 299 279 299 299 299 299 299 299 299 299 299 299 299]})
 
-(fn getTileAt [map x y]
-  (getTile (. (. map x) y)))
+(fn getTileAt [m x y]
+  (getTile (. (. m x) y)))
 
 (fn sumTile [m width height x y]
   (let [sum 0
@@ -93,28 +93,27 @@
         (. autoType bitmask))
       (. (. m x) y))))
 
-(fn map.loadMap [newMap width height cam]
+(fn tilemap.loadMap [newMap width height cam]
   "Loads a new map into the game world"
-  (tset map :width width)
-  (tset map :height height)
+  (tset tilemap :width width)
+  (tset tilemap :height height)
   (set tiles {})
   ; shift the camera bound up one tile, and shrink it one tile
   (cam:setBounds TILE_WIDTH 0 (- WIDTH TILE_WIDTH) (* height TILE_WIDTH))
   (for [x 1 width]
     (table.insert tiles {})
     (for [y 1 height]
-      (print x y)
       (let [id (autoTile newMap width height x y)
             type (getTile id)]
         (if (= 1 id)
             (do 
-              (tset map :player {:x x :y y})
+              (tset tilemap :player {:x x :y y})
               (tset (. tiles x) y 400))
             (= nil type)
             (tset (. tiles x) y id)
-            (map.setTile x y id))))))
+            (tilemap.setTile x y id))))))
 
-(fn map.setTile [x y tile]
+(fn tilemap.setTile [x y tile]
   "Sets a tile in the game world"
   (tset (. tiles x) y tile)
   (let [type (getTile tile)
@@ -126,7 +125,7 @@
     (when action 
       (world:add {action true :direction direction} realX realY width height))))
 
-(fn map.update [dt]
+(fn tilemap.update [dt]
   "Updates all of the animations in the map"
   (conveyorBottomDown:update dt)
   (conveyorBottomUp:update dt)
@@ -135,10 +134,10 @@
   (conveyorTopUp:update dt)
   (conveyorMidUp:update dt))
 
-(fn map.draw []
+(fn tilemap.draw []
   "Draws the map; the camera handles drawing the appropriate area"
-  (for [x 1 map.width]
-    (for [y 1 map.height]
+  (for [x 1 tilemap.width]
+    (for [y 1 tilemap.height]
       (let [tile (. (. tiles x) y)
             animation (if (getTile tile) (. (getTile tile) :animation))
             realX (* (- x 1) 8)
@@ -147,4 +146,4 @@
           (animation:draw tileSheet realX realY)
           (love.graphics.draw tileSheet (. tileAtlas tile) realX realY))))))
 
-map
+tilemap

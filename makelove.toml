@@ -3,9 +3,9 @@ default_targets = ["win32", "win64", "appimage"]
 build_directory = "makelove-build"
 
 love_files = [
-    "*.lua",
-    "./lib/*",
-    "./assets/*"
+    "./source/*.lua",
+    "./source/lib/*",
+    "./source/assets/*"
 ]
 
 [hooks]

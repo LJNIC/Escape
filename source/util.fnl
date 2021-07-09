@@ -5,7 +5,7 @@
 (fn util.opposite [operation]
   (if (= operation util.add) util.sub util.add))
 
-(fn util.updateObject [object x y]
+(fn util.update-object [object x y]
   (set object.x x)
   (set object.y y)
   (world:update object x y))
@@ -21,30 +21,30 @@
   [0.5 0 0] 1 ; player
 })
 
-(fn getTile [red green blue]
+(fn get-tile [red green blue]
   "Returns a tile id based on the RGB value"
   (var id 400)
   (each [c tile (pairs colors)]
     (let [[r g b] c]
-      (when (and (= (math.to_precision red 1) r) (= (math.to_precision green 1) g) (= (math.to_precision blue 1) b))
+      (when (and (= (math.to-precision red 1) r) (= (math.to-precision green 1) g) (= (math.to-precision blue 1) b))
         (set id tile))))
   id)
 
-(fn util.loadMap [path]
+(fn util.load-map [path]
   "Loads an image-level into a table and returns it"
   (let [image (love.image.newImageData path)
-        newMap {}
+        new-map {}
         width (image:getWidth)
         height (image:getHeight)]
     (for [x 1 width]
-      (table.insert newMap [])
+      (table.insert new-map [])
       (for [y 1 height]
-        (table.insert (. newMap  x) 400)))
+        (table.insert (. new-map  x) 400)))
     (image:mapPixel 
       (fn [x y r g b a] 
-        (let [tile (getTile r g b)]
-          (tset (. newMap (+ 1 x)) (+ 1 y) tile))
+        (let [tile (get-tile r g b)]
+          (tset (. new-map (+ 1 x)) (+ 1 y) tile))
         (values r g b a)))
-    newMap))
+    new-map))
 
 util

@@ -4,10 +4,10 @@
 (local lava {:moving false :death true :x TILE_WIDTH :y TILE_WIDTH
              :image (love.graphics.newImage "assets/lava_wave.png")
              :background (love.graphics.newImage "assets/lava.png")})
-(local lavaGrid (anim8.newGrid 16 8 128 8))
+(local lava-grid (anim8.newGrid 16 8 128 8))
 (fn animation [frames duration]
   (anim8.newAnimation frames duration))
-(set lava.animation (animation (lavaGrid "1-8" 1) 0.15))
+(set lava.animation (animation (lava-grid "1-8" 1) 0.15))
 
 ; Initialize lava
 (fn lava.init [world tilemap]
@@ -17,7 +17,7 @@
 
 (fn lava.update [dt]
   (when lava.moving
-    (util.updateObject lava lava.x (- lava.y (* 10 dt)))
+    (util.update-object lava lava.x (- lava.y (* 20 dt)))
     (lava.animation:update dt)))
 
 (fn lava.draw [] 

@@ -4,6 +4,8 @@
 (local camera (require :lib.camera))
 (local util (require :util))
 (let [batteries (require :lib.batteries)] (batteries:export))
+(local timers (require :timers))
+(local animations (require :animations))
 
 ; game width is 2 tiles wider than we actually render
 (global [GAME_WIDTH GAME_HEIGHT] [14 32])
@@ -29,20 +31,22 @@
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(local newMap (util.loadMap (.. "assets/level" level ".png")))
-(tilemap.loadMap newMap (length newMap) (length (. newMap 1)) cam)
+(local new-map (util.load-map (.. "assets/level" level ".png")))
+(tilemap.load-map new-map (length new-map) (length (. new-map 1)) cam)
 (player.init world tilemap)
 (lava.init world tilemap)
 
 (fn love.update [dt]
   (player.update dt)
+  (timers.update dt)
+  (animations.update dt)
   (tilemap.update dt)
   ;(lava.update dt)
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
-(fn updateLevel []
-  (love.filesystem.write "level.txt" (tostring (mathx.wrap (+ level 1) 1 10)))
+(fn update-level []
+  (love.filesystem.write "level.txt" (tostring (math.wrap (+ level 1) 1 10)))
   (love.event.quit "restart"))
 
 (fn love.keypressed [key]
@@ -51,7 +55,7 @@
       (and (= "space" key) player.alive)
       (do (player.jump) (set lava.moving true))
       (= "n" key)
-      (updateLevel)
+      (update-level)
       (= "r" key)
       (love.event.quit "restart")))
 
@@ -62,6 +66,7 @@
   (lava.draw)
   (tilemap.draw)
   (player.draw)
+  (animations.draw)
 
   (cam:detach)
   (push:finish))

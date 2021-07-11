@@ -22,17 +22,15 @@
 (local cam (camera 0 0  (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
 
 (global world (bump.newWorld TILE_WIDTH))
-(tilemap.init)
 
 ; load level id from file
 (var level 0)
-(when (not (love.filesystem.getInfo "level.txt"))
+(when (love.filesystem.getInfo "level.txt")
   (love.filesystem.newFile "level.txt" "r")
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(local new-map (util.load-map (.. "assets/level" level ".png")))
-(tilemap.load-map new-map (length new-map) (length (. new-map 1)) cam)
+(tilemap.load-map (.. "levels/level-" level) cam)
 (player.init world tilemap)
 (lava.init world tilemap)
 
@@ -41,12 +39,12 @@
   (timers.update dt)
   (animations.update dt)
   (tilemap.update dt)
-  ;(lava.update dt)
+  (lava.update dt)
   (cam:update dt)
   (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
 
 (fn update-level []
-  (love.filesystem.write "level.txt" (tostring (math.wrap (+ level 1) 1 10)))
+  (love.filesystem.write "level.txt" (tostring (math.wrap (+ level 1) 1 1)))
   (love.event.quit "restart"))
 
 (fn love.keypressed [key]

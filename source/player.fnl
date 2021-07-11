@@ -40,13 +40,13 @@
 ; animation  - which animation to draw (walk, die, jump, etc)
 ; image      - the corresponding image for the animation
 ; alive      - whether the player is dead or alive
-(local player {:x 16 :y (- (* GAME_HEIGHT TILE_WIDTH) 16) :speed SPEED :direction util.add :jumping false :jump-timer 0
+(local player {:x 16 :y 164 :speed SPEED :direction util.add :jumping false :jump-timer 0
                :has-jump false :on-wall false :on-ground true :gravity 0 :weight WEIGHT
                :animation walk :image character-image :alive true})
 
 (fn player.init [world tilemap]
   (when tilemap.player 
-    (set player.x (* TILE_WIDTH tilemap.player.x))
+    (set player.x (+ (* TILE_WIDTH tilemap.player.x) 16))
     (set player.y (* TILE_WIDTH tilemap.player.y)))
   (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1)))
 

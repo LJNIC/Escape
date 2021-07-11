@@ -3,7 +3,42 @@
  <editorsettings>
   <export target="tileset.lua" format="lua"/>
  </editorsettings>
- <image source="tiles.png" width="160" height="160"/>
+ <image source="../assets/tiles.png" width="160" height="160"/>
+ <tile id="4">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
+ <tile id="5">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
+ <tile id="6">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
+ <tile id="7">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
+ <tile id="8">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
+ <tile id="9">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
+ <tile id="10">
+  <properties>
+   <property name="action" value="ground"/>
+  </properties>
+ </tile>
  <tile id="180">
   <properties>
    <property name="action" value="ground"/>

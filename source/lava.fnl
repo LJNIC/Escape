@@ -17,7 +17,7 @@
 
 (fn lava.update [dt]
   (when lava.moving
-    (util.update-object lava lava.x (- lava.y (* 20 dt)))
+    (util.update-object lava lava.x (- lava.y (* 10 dt)))
     (lava.animation:update dt)))
 
 (fn lava.draw [] 

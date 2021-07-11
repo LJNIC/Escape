@@ -20,6 +20,7 @@
 
 ; again, we render 2 tiles less than our total width
 (local cam (camera 0 0  (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
+(cam:setFollowStyle "PLATFORMER")
 
 (global world (bump.newWorld TILE_WIDTH))
 
@@ -41,7 +42,9 @@
   (tilemap.update dt)
   (lava.update dt)
   (cam:update dt)
-  (cam:follow (+ (/ WIDTH 2)) (math.floor player.y)))
+  (cam:follow (/ WIDTH 2) player.y)
+  (set cam.x (math.floor cam.x))
+  (set cam.y (math.floor cam.y)))
 
 (fn update-level []
   (love.filesystem.write "level.txt" (tostring (math.wrap (+ level 1) 1 1)))
@@ -59,12 +62,13 @@
 
 (fn love.draw []
   (push:start)
+  (tilemap.draw-background cam)
   (cam:attach)
 
-  (lava.draw)
   (tilemap.draw)
   (player.draw)
   (animations.draw)
+  (lava.draw)
 
   (cam:detach)
   (push:finish))

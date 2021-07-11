@@ -8,7 +8,7 @@ return {
   spacing = 0,
   margin = 0,
   columns = 20,
-  image = "tiles.png",
+  image = "../assets/tiles.png",
   imagewidth = 160,
   imageheight = 160,
   objectalignment = "unspecified",
@@ -25,6 +25,48 @@ return {
   wangsets = {},
   tilecount = 400,
   tiles = {
+    {
+      id = 4,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
+    {
+      id = 5,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
+    {
+      id = 6,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
+    {
+      id = 7,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
+    {
+      id = 8,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
+    {
+      id = 9,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
+    {
+      id = 10,
+      properties = {
+        ["action"] = "ground"
+      }
+    },
     {
       id = 180,
       properties = {

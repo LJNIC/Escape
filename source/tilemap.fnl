@@ -33,11 +33,12 @@
 
 (local tilemap {})
 (var tiles {})
+(var background {})
 
-(fn tilemap.each-tile [apply]
+(fn tilemap.each-tile [apply tile-list]
   (var x 1)
   (var y 1)
-  (each [index tile-id (ipairs tiles)]
+  (each [index tile-id (ipairs (or tile-list tiles))]
     (apply x y tile-id)
     (set x (+ x 1))
     (when (> x tilemap.width) 
@@ -50,6 +51,7 @@
   (set tilemap.width level.width)
   (set tilemap.height level.height)
   (set tiles (. (. level.layers 1) :data))
+  (set background (. (. level.layers 2) :data))
   ; shift the camera bound up one tile, and shrink it one tile
   (cam:setBounds TILE_WIDTH 0 (- WIDTH TILE_WIDTH) (* tilemap.height TILE_WIDTH))
   (tilemap.each-tile tilemap.set-tile))
@@ -65,7 +67,7 @@
     (when action 
       (world:add {action true :direction direction} real-x real-y width height))))
 
-(fn tilemap.update [dt]
+(fn tilemap.update [dt cam]
   "Updates all of the animations in the map"
   (each [_ tile (ipairs tileset)]
     (when tile.animation
@@ -84,5 +86,14 @@
 (fn tilemap.draw []
   "Draws the map; the camera handles drawing the appropriate area"
   (tilemap.each-tile draw-tile))
+
+(fn tilemap.draw-background [cam]
+  (let [orig-y cam.y
+        new-y (math.floor (* cam.y 0.5))]
+    (set cam.y new-y)
+    (cam:attach)
+    (tilemap.each-tile draw-tile background)
+    (set cam.y orig-y)
+    (cam:detach)))
 
 tilemap

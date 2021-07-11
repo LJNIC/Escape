@@ -79,7 +79,7 @@
   (set player.speed SPEED))
 
 (fn create-dust [x y animation dir]
-  (animations.add x y animation dust-image dir 55 dir))
+  (animations.add x y animation dust-image dir (love.math.random 50 60) dir))
 
 (fn player.air-jump []
   (air-jump:gotoFrame 1)
@@ -90,8 +90,8 @@
     0.15
     (fn [t]
       (create-dust player.x player.y (let [d (dust-animation:clone)] (d:flipV)) (vec2 0 1))
-      (create-dust (+ player.x 3) player.y (let [d (dust-animation:clone)] (d:flipH)) (vec2 0.75 1))
-      (create-dust (- player.x 3) player.y (dust-animation:clone) (vec2 -0.75 1))))
+      (create-dust (+ player.x 3) player.y (let [d (dust-animation:clone)] (d:flipH)) (vec2 0.25 1))
+      (create-dust (- player.x 3) player.y (dust-animation:clone) (vec2 -0.25 1))))
   (player.wall-jump true))
 
 (fn player.jump []
@@ -204,6 +204,6 @@
         dead (not player.alive)
         orientation (if right 1 -1)
         ox (if right (if dead 4 0) (if dead 12 6))]
-    (player.animation:draw player.image (math.floor player.x) (math.floor (- player.y 1)) 0 orientation 1 ox (if dead 4 0))))
+    (player.animation:draw player.image (math.floor player.x) (math.floor (+ player.y 0)) 0 orientation 1 ox (if dead 4 0))))
 
 player

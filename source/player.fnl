@@ -46,8 +46,8 @@
 
 (fn player.init [world tilemap]
   (when tilemap.player 
-    (set player.x (+ (* TILE_WIDTH tilemap.player.x) 16))
-    (set player.y (* TILE_WIDTH tilemap.player.y)))
+    (set player.x (+ tilemap.player.x TILE_WIDTH))
+    (set player.y (- tilemap.player.y TILE_WIDTH)))
   (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1)))
 
 (fn player.kill []

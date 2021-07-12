@@ -9,7 +9,7 @@ return {
   tilewidth = 8,
   tileheight = 8,
   nextlayerid = 5,
-  nextobjectid = 11,
+  nextobjectid = 12,
   properties = {},
   tilesets = {
     {
@@ -130,7 +130,24 @@ return {
       parallaxx = 1,
       parallaxy = 1,
       properties = {},
-      objects = {}
+      objects = {
+        {
+          id = 11,
+          name = "spawn",
+          type = "",
+          shape = "rectangle",
+          x = 56,
+          y = 233,
+          width = 8,
+          height = 8,
+          rotation = 0,
+          gid = 329,
+          visible = true,
+          properties = {
+            ["spawn"] = true
+          }
+        }
+      }
     }
   }
 }

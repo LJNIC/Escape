@@ -45,13 +45,24 @@
       (set y (+ 1 y))
       (set x 1))))
 
+(fn load-objects [objects]
+  (each [_ object (ipairs objects)]
+    (when (= object.name "spawn")
+      (set tilemap.player (vec2 object.x object.y)))))
+
 (fn tilemap.load-map [level-file cam]
   "Loads a new map into the game world"
   (local level (require level-file))
   (set tilemap.width level.width)
   (set tilemap.height level.height)
-  (set tiles (. (. level.layers 1) :data))
-  (set background (. (. level.layers 2) :data))
+  (each [_ layer (ipairs (. level.layers))]
+    (if 
+      (= layer.name "tiles")
+      (set tiles layer.data)
+      (= layer.name "background")
+      (set background layer.data)
+      (= layer.name "objects")
+      (load-objects layer.objects)))
   ; shift the camera bound up one tile, and shrink it one tile
   (cam:setBounds TILE_WIDTH 0 (- WIDTH TILE_WIDTH) (* tilemap.height TILE_WIDTH))
   (tilemap.each-tile tilemap.set-tile))

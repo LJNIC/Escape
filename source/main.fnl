@@ -40,7 +40,7 @@
   (timers.update dt)
   (animations.update dt)
   (tilemap.update dt)
-  (lava.update dt)
+  ;(lava.update dt)
   (cam:update dt)
   (cam:follow (/ WIDTH 2) player.y)
   (set cam.x (math.floor cam.x))

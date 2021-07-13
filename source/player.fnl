@@ -137,6 +137,10 @@
       (= col.normal.x 1)
       (set player.gravity (col.other.direction 0 -20))))
 
+(fn get-direction [num]
+  (let [sign (math.sign num)]
+    (if (= sign -1) util.sub util.add)))
+
 (fn player.bounce [col]
   (set player.speed SPEED)
   (set player.animation jump)
@@ -149,7 +153,7 @@
         (set player.gravity -100))
       (do 
         (audio.play :bounce)
-        (set player.direction col.other.direction)
+        (set player.direction (get-direction col.normal.x))
         (player.normal-jump)
         (set player.gravity -100))))
 

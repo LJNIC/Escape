@@ -99,6 +99,17 @@
    <property name="action" value="ground"/>
   </properties>
  </tile>
+ <tile id="209">
+  <properties>
+   <property name="action" value="bounce"/>
+   <property name="offset_x" type="int" value="-4"/>
+  </properties>
+ </tile>
+ <tile id="210">
+  <properties>
+   <property name="action" value="bounce"/>
+  </properties>
+ </tile>
  <tile id="220">
   <properties>
    <property name="action" value="ground"/>

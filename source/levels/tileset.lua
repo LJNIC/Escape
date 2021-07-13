@@ -140,6 +140,19 @@ return {
       }
     },
     {
+      id = 209,
+      properties = {
+        ["action"] = "bounce",
+        ["offset_x"] = -4
+      }
+    },
+    {
+      id = 210,
+      properties = {
+        ["action"] = "bounce"
+      }
+    },
+    {
       id = 220,
       properties = {
         ["action"] = "ground"

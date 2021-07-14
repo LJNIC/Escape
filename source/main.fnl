@@ -8,9 +8,8 @@
 (local animations (require :animations))
 
 ; game width is 2 tiles wider than we actually render
-(global [GAME_WIDTH GAME_HEIGHT] [14 32])
 (global TILE_WIDTH 8)
-(global [WIDTH HEIGHT] [96 128])
+(global [WIDTH HEIGHT] [112 128])
 (local player (require :player))
 (local lava (require :lava))
 (local tilemap (require :tilemap))
@@ -19,7 +18,7 @@
 (push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
 
 ; again, we render 2 tiles less than our total width
-(local cam (camera 0 0  (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
+(local cam (camera 0 0 (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
 (cam:setFollowStyle "PLATFORMER")
 
 (global world (bump.newWorld TILE_WIDTH))
@@ -40,7 +39,7 @@
   (timers.update dt)
   (animations.update dt)
   (tilemap.update dt)
-  ;(lava.update dt)
+  (lava.update dt)
   (cam:update dt)
   (cam:follow (/ WIDTH 2) player.y)
   (set cam.x (math.floor cam.x))

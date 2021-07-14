@@ -3,6 +3,7 @@
 (local audio (require :audio))
 (local timers (require :timers))
 (local animations (require :animations))
+(local tilemap (require :tilemap))
 
 (local character-image (love.graphics.newImage "assets/astro.png"))
 (local character-grid (anim8.newGrid 8 8 128 8))
@@ -181,13 +182,14 @@
       (set player.speed 0)
       (set player.direction (util.opposite player.direction)))
     (when player.alive 
-      (if (> player.x (+ WIDTH 4))
-          (util.update-object player 4 player.y)
-          (< player.x 4)
-          (util.update-object player (+ WIDTH 4) player.y)
-          (do 
-            (set player.x actualX)
-            (set player.y actualY))))))
+      (let [right-edge (+ (- (* tilemap.width TILE_WIDTH) TILE_WIDTH) 4)]
+        (if (> player.x right-edge)
+            (util.update-object player 4 player.y)
+            (< player.x 4)
+            (util.update-object player (- right-edge TILE_WIDTH) player.y)
+            (do 
+              (set player.x actualX)
+              (set player.y actualY)))))))
 
 (fn player.update [dt]
   (when player.alive (let [x (player.direction player.x (* player.speed dt))

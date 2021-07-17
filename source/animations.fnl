@@ -9,7 +9,7 @@
 (fn animations.update [dt]
   (for [i (# animations.list) 1 -1]
     (let [animation (. animations.list i)
-          new-pos (animation.pos:vaddi (animation.dir:smuli (* dt animation.speed)))]
+          new-pos (+ animation.pos (* animation.dir (* dt animation.speed)))]
       (animation.animation:update dt)
       (set animation.pos new-pos)
       (when (= animation.animation.status "paused") 

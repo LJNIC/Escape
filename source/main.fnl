@@ -1,11 +1,12 @@
 (local bump (require :lib.bump))
 (local anim8 (require :lib.anim8))
-(local push (require :lib.push))
 (local camera (require :lib.camera))
 (local util (require :util))
 (let [batteries (require :lib.batteries)] (batteries:export))
+(global vec2 (require :lib.vec2))
 (local timers (require :timers))
 (local animations (require :animations))
+(love.graphics.setDefaultFilter "nearest" "nearest")
 
 ; game width is 2 tiles wider than we actually render
 (global TILE_WIDTH 8)
@@ -14,8 +15,7 @@
 (local lava (require :lava))
 (local tilemap (require :tilemap))
 
-(love.graphics.setDefaultFilter "nearest" "nearest")
-(push:setupScreen WIDTH HEIGHT (love.graphics.getDimensions))
+(local canvas (love.graphics.newCanvas WIDTH HEIGHT))
 
 ; again, we render 2 tiles less than our total width
 (local cam (camera 0 0 (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
@@ -32,14 +32,14 @@
 
 (tilemap.load-map (.. "levels/level-" level) cam)
 (player.init world tilemap)
-(lava.init world tilemap)
+;(lava.init world tilemap)
 
 (fn love.update [dt]
   (player.update dt)
   (timers.update dt)
   (animations.update dt)
   (tilemap.update dt)
-  (lava.update dt)
+  ;(lava.update dt)
   (cam:update dt)
   (cam:follow (/ WIDTH 2) player.y)
   (set cam.x (math.floor cam.x))
@@ -60,15 +60,18 @@
       (love.event.quit "restart")))
 
 (fn love.draw []
-  (push:start)
+  (love.graphics.setCanvas canvas)
+  (love.graphics.clear)
   (tilemap.draw-background cam)
   (cam:attach)
 
   (tilemap.draw)
   (player.draw)
   (animations.draw)
-  (lava.draw)
+  ;(lava.draw)
 
   (cam:detach)
-  (push:finish))
+  (love.graphics.setCanvas)
+  (love.graphics.scale 5 5)
+  (love.graphics.draw canvas (- (/ (/ (love.graphics.getWidth) 5) 2) (/ WIDTH 2)) -20))
   

@@ -1,9 +1,9 @@
-(local anim8 (require :lib/anim8))
-(local util (require :util))
+(local anim8 (require :source.lib.anim8))
+(local util (require :source.util))
 
 (local lava {:moving false :death true :x TILE_WIDTH :y TILE_WIDTH
-             :image (love.graphics.newImage "assets/lava_wave.png")
-             :background (love.graphics.newImage "assets/lava.png")})
+             :image (love.graphics.newImage "source/assets/lava_wave.png")
+             :background (love.graphics.newImage "source/assets/lava.png")})
 (local lava-grid (anim8.newGrid 16 8 128 8))
 (fn animation [frames duration]
   (anim8.newAnimation frames duration))

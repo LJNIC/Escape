@@ -1,12 +1,12 @@
-(local util (require :util))
-(local anim8 (require :lib/anim8))
+(local util (require :source.util))
+(local anim8 (require :source.lib.anim8))
 (local map functional.map)
 
 ; tile sheet - just the image
 ; tile atlas - array of quads
 ; tile set   - id -> tile info table
 
-(local tile-sheet (love.graphics.newImage "assets/tiles.png"))
+(local tile-sheet (love.graphics.newImage "source/assets/tiles.png"))
 (local tile-atlas {})
 (for [i 0 19]
   (for [j 0 19]
@@ -22,7 +22,7 @@
 (local default-tile {:width 8 :height 8 :offset-x 0 :offset-y 0 :action nil})
 (tset default-tile :__index default-tile)
 (local tileset 
-  (let [tiled (. (require :levels/tileset) :tiles)
+  (let [tiled (. (require :source.levels.tileset) :tiles)
         tileset {}]
     (each [_ tile (ipairs tiled)]
       (let [{: id : properties : animation} tile

@@ -1,11 +1,11 @@
-(local util (require :util))
-(local anim8 (require :lib/anim8))
-(local audio (require :audio))
-(local timers (require :timers))
-(local animations (require :animations))
-(local tilemap (require :tilemap))
+(local util (require :source.util))
+(local anim8 (require :source.lib.anim8))
+(local audio (require :source.audio))
+(local timers (require :source.timers))
+(local animations (require :source.animations))
+(local tilemap (require :source.tilemap))
 
-(local character-image (love.graphics.newImage "assets/astro.png"))
+(local character-image (love.graphics.newImage "source/assets/astro.png"))
 (local character-grid (anim8.newGrid 8 8 128 8))
 (local walk (anim8.newAnimation (character-grid "2-7" 1) 0.1))
 (local jump (anim8.newAnimation (character-grid 5 1) 1000000))
@@ -13,14 +13,15 @@
 (local fall (anim8.newAnimation (character-grid 9 1) 10000))
 (local wall (anim8.newAnimation (character-grid 11 1) 1000000))
 
-(local explosion-image (love.graphics.newImage "assets/explosion2.png"))
+(local explosion-image (love.graphics.newImage "source/assets/explosion2.png"))
 (local explosion-grid (anim8.newGrid 16 16 256 16))
 (local die (anim8.newAnimation (explosion-grid "6-16" 1) 0.1 "pauseAtEnd"))
-(local dust-image (love.graphics.newImage "assets/dust.png"))
+(local dust-image (love.graphics.newImage "source/assets/dust.png"))
+(dust-image:setFilter "linear" "linear")
 (local dust-animation
   (let [grid (anim8.newGrid 8 8 88 8)]
     (anim8.newAnimation (grid "1-10" 1) 0.05 "pauseAtEnd")))
-(local small-dust-image (love.graphics.newImage "assets/dust2.png"))
+(local small-dust-image (love.graphics.newImage "source/assets/dust2.png"))
 (local small-dust-animation 
   (let [grid (anim8.newGrid 6 6 66 6)]
     (anim8.newAnimation (grid "1-10" 1) 0.05 "pauseAtEnd")))

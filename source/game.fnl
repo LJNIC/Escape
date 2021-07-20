@@ -1,19 +1,17 @@
-(local bump (require :lib.bump))
-(local anim8 (require :lib.anim8))
-(local camera (require :lib.camera))
-(local util (require :util))
-(let [batteries (require :lib.batteries)] (batteries:export))
-(global vec2 (require :lib.vec2))
-(local timers (require :timers))
-(local animations (require :animations))
+(local bump (require :source.lib.bump))
+(local anim8 (require :source.lib.anim8))
+(local camera (require :source.lib.camera))
+(local util (require :source.util))
+(local timers (require :source.timers))
+(local animations (require :source.animations))
 (love.graphics.setDefaultFilter "nearest" "nearest")
 
 ; game width is 2 tiles wider than we actually render
 (global TILE_WIDTH 8)
 (global [WIDTH HEIGHT] [112 128])
-(local player (require :player))
-(local lava (require :lava))
-(local tilemap (require :tilemap))
+(local player (require :source.player))
+(local lava (require :source.lava))
+(local tilemap (require :source.tilemap))
 
 (local canvas (love.graphics.newCanvas WIDTH HEIGHT))
 
@@ -30,36 +28,42 @@
   (love.filesystem.write "level.txt" "1"))
 (let [contents (love.filesystem.read "level.txt")] (set level (tonumber contents)))
 
-(tilemap.load-map (.. "levels/level-" level) cam)
+(tilemap.load-map (.. "source/levels/level-" level) cam)
 (player.init world tilemap)
 ;(lava.init world tilemap)
 
-(fn love.update [dt]
-  (player.update dt)
-  (timers.update dt)
-  (animations.update dt)
-  (tilemap.update dt)
-  ;(lava.update dt)
-  (cam:update dt)
-  (cam:follow (/ WIDTH 2) player.y)
-  (set cam.x (math.floor cam.x))
-  (set cam.y (math.floor cam.y)))
+(local game {})
+
+(var paused false)
+(fn game.update [self dt]
+  (when (not paused)
+    (player.update dt)
+    (timers.update dt)
+    (animations.update dt)
+    (tilemap.update dt)
+    ;(lava.update dt)
+    (cam:update dt)
+    (cam:follow (/ WIDTH 2) player.y)
+    (set cam.x (math.floor cam.x))
+    (set cam.y (math.floor cam.y))))
 
 (fn update-level []
   (love.filesystem.write "level.txt" (tostring (math.wrap (+ level 1) 1 1)))
   (love.event.quit "restart"))
 
-(fn love.keypressed [key]
+(fn game.keypressed [self key]
   (if (= "escape" key) 
       (love.event.quit)
       (and (= "space" key) player.alive)
       (do (player.jump) (set lava.moving true))
+      (= "p" key)
+      (set paused (not paused))
       (= "n" key)
       (update-level)
       (= "r" key)
       (love.event.quit "restart")))
 
-(fn love.draw []
+(fn game.draw [self]
   (love.graphics.setCanvas canvas)
   (love.graphics.clear)
   (tilemap.draw-background cam)
@@ -75,3 +79,4 @@
   (love.graphics.scale 5 5)
   (love.graphics.draw canvas (- (/ (/ (love.graphics.getWidth) 5) 2) (/ WIDTH 2)) -20))
   
+game

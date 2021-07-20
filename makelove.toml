@@ -5,7 +5,8 @@ build_directory = "makelove-build"
 love_files = [
     "./source/*.lua",
     "./source/lib/*",
-    "./source/assets/*"
+    "./source/assets/*",
+    "./main.lua"
 ]
 
 [hooks]

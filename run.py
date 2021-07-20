@@ -31,7 +31,7 @@ for subdir, dirs, files in os.walk("."):
                 lua_file.write(re.sub(r'\[\"(.+?)\"\]', replace_dash, lua_file_contents))
 
 if run_love:
-    os.system("love source/")
+    os.system("love .")
 
 if delete:
     for file_name in file_names:

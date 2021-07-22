@@ -69,6 +69,15 @@
    <property name="action" value="ground"/>
   </properties>
  </tile>
+ <tile id="191">
+  <properties>
+   <property name="action" value="button"/>
+   <property name="height" type="int" value="4"/>
+   <property name="offset_x" type="int" value="1"/>
+   <property name="offset_y" type="int" value="4"/>
+   <property name="width" type="int" value="6"/>
+  </properties>
+ </tile>
  <tile id="200">
   <properties>
    <property name="action" value="ground"/>

@@ -104,6 +104,16 @@ return {
       }
     },
     {
+      id = 191,
+      properties = {
+        ["action"] = "button",
+        ["height"] = 4,
+        ["offset_x"] = 1,
+        ["offset_y"] = 4,
+        ["width"] = 6
+      }
+    },
+    {
       id = 200,
       properties = {
         ["action"] = "ground"

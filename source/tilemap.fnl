@@ -36,6 +36,7 @@
 (var background {})
 
 (fn tilemap.each-tile [apply tile-list]
+  "Calls a function on every tile in the map with parameters x, y, tile-id"
   (var x 1)
   (var y 1)
   (each [index tile-id (ipairs (or tile-list tiles))]
@@ -50,6 +51,10 @@
     (when (= object.name "spawn")
       (set tilemap.player (vec2 object.x object.y)))))
 
+(fn load-tiles [tile-ids]
+  (set tiles tile-ids)
+  (tilemap.each-tile tilemap.set-tile))
+
 (fn tilemap.load-map [level-file cam]
   "Loads a new map into the game world"
   (local level (require level-file))
@@ -58,14 +63,13 @@
   (each [_ layer (ipairs (. level.layers))]
     (if 
       (= layer.name "tiles")
-      (set tiles layer.data)
+      (load-tiles layer.data)
       (= layer.name "background")
       (set background layer.data)
       (= layer.name "objects")
       (load-objects layer.objects)))
   ; shift the camera bound up one tile, and shrink it one tile
-  (cam:setBounds TILE_WIDTH 0 (- WIDTH TILE_WIDTH) (* tilemap.height TILE_WIDTH))
-  (tilemap.each-tile tilemap.set-tile))
+  (cam:setBounds tile-width 0 (- game-width tile-width) (* tilemap.height tile-width)))
 
 (fn tilemap.set-tile [x y tile-id]
   "Sets a tile in the game world"
@@ -73,10 +77,12 @@
         {: width : height : offset-x : offset-y : action : direction} tile-info 
         real-x (+ offset-x (* 8 (- x 1)))
         real-y (+ offset-y (* 8 (- y 1)))
-        existing (world:queryPoint (+ real-x 4) (+ real-y 4))]
+        existing (world:queryPoint (+ 6 real-x) (+ 6 real-y))]
     (each [index tile (pairs existing)] (world:remove tile))
     (when action 
-      (world:add {action true :direction direction} real-x real-y width height))))
+      (let [tile { : action : direction : tile-id }]
+        (tset tiles (+ x (* (- y 1) tilemap.width)) tile)
+        (world:add tile real-x real-y width height)))))
 
 (fn tilemap.update [dt cam]
   "Updates all of the animations in the map"
@@ -84,9 +90,10 @@
     (when tile.animation
       (tile.animation:update dt))))
 
-(fn draw-tile [x y tile-id]
+(fn draw-tile [x y tile]
   "Draws a single tile"
-  (let [tile-info (. tileset tile-id)
+  (let [tile-id (or (and (= (type tile) "table") tile.tile-id) tile)
+        tile-info (. tileset tile-id)
         real-x (* (- x 1) 8)
         real-y (* (- y 1) 8)
         animation (and tile-info tile-info.animation)]
@@ -99,6 +106,7 @@
   (tilemap.each-tile draw-tile))
 
 (fn tilemap.draw-background [cam]
+  "Draws the background tiles at half of the camera's y position"
   (let [orig-y cam.y
         new-y (math.floor (* cam.y 0.5))]
     (set cam.y new-y)

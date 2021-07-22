@@ -48,9 +48,9 @@
 
 (fn player.init [world tilemap]
   (when tilemap.player 
-    (set player.x (+ tilemap.player.x TILE_WIDTH))
-    (set player.y (- tilemap.player.y TILE_WIDTH)))
-  (world:add player player.x player.y (- TILE_WIDTH 2) (- TILE_WIDTH 1)))
+    (set player.x (+ tilemap.player.x tile-width))
+    (set player.y (- tilemap.player.y tile-width)))
+  (world:add player player.x player.y (- tile-width 2) (- tile-width 1)))
 
 (fn player.kill []
   (audio.play :die)
@@ -159,21 +159,29 @@
         (player.normal-jump)
         (set player.gravity -100))))
 
-(fn doNothing [] (+ 0 0))
+(fn player.button [col]
+  (set col.other.tile-id 193)
+  (world:remove col.other)
+  (audio.play :button))
+
+(fn void [] (+ 0 0))
 
 (fn player.move [x y]
   (let [(actualX actualY cols len) (world:move player x y)]
     (each [index col (pairs cols)]
-      (if (not player.alive)
-          (doNothing)
-          col.other.death
-          (player.kill)
-          col.other.ground 
-          (player.handle-ground col)
-          col.other.bounce
-          (player.bounce col)
-          col.other.conveyor
-          (player.conveyor col)))
+      (let [action col.other.action]
+        (if (not player.alive)
+            (void)
+            (= :death action)
+            (player.kill)
+            (= :ground action)
+            (player.handle-ground col)
+            (= :bounce action)
+            (player.bounce col)
+            (= :conveyor action)
+            (player.conveyor col)
+            (= :button action)
+            (player.button col))))
     ; we fell off a wall
     (when (and (= len 0) player.on-wall)
       (set player.animation fall)
@@ -183,11 +191,11 @@
       (set player.speed 0)
       (set player.direction (util.opposite player.direction)))
     (when player.alive 
-      (let [right-edge (+ (- (* tilemap.width TILE_WIDTH) TILE_WIDTH) 4)]
+      (let [right-edge (+ (- (* tilemap.width tile-width) tile-width) 4)]
         (if (> player.x right-edge)
             (util.update-object player 4 player.y)
             (< player.x 4)
-            (util.update-object player (- right-edge TILE_WIDTH) player.y)
+            (util.update-object player (- right-edge tile-width) player.y)
             (do 
               (set player.x actualX)
               (set player.y actualY)))))))

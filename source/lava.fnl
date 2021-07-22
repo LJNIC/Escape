@@ -1,7 +1,7 @@
 (local anim8 (require :source.lib.anim8))
 (local util (require :source.util))
 
-(local lava {:moving false :death true :x TILE_WIDTH :y TILE_WIDTH
+(local lava {:moving false :action "death" :x tile-width :y tile-width 
              :image (love.graphics.newImage "source/assets/lava_wave.png")
              :background (love.graphics.newImage "source/assets/lava.png")})
 (local lava-grid (anim8.newGrid 16 8 128 8))
@@ -11,9 +11,9 @@
 
 ; Initialize lava
 (fn lava.init [world tilemap]
-  (let [height (* tilemap.height TILE_WIDTH)]
-    (tset lava :y height)
-    (world:add lava lava.x lava.y WIDTH height)))
+  (let [height (* tilemap.height tile-width)]
+    (set lava.y height)
+    (world:add lava lava.x lava.y game-width height)))
 
 (fn lava.update [dt]
   (when lava.moving

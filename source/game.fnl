@@ -7,19 +7,18 @@
 (love.graphics.setDefaultFilter "nearest" "nearest")
 
 ; game width is 2 tiles wider than we actually render
-(global TILE_WIDTH 8)
-(global [WIDTH HEIGHT] [112 128])
+(global [game-width game-height] [112 128])
 (local player (require :source.player))
 (local lava (require :source.lava))
 (local tilemap (require :source.tilemap))
 
-(local canvas (love.graphics.newCanvas WIDTH HEIGHT))
+(local canvas (love.graphics.newCanvas game-width game-height))
 
 ; again, we render 2 tiles less than our total width
-(local cam (camera 0 0 (- WIDTH (* TILE_WIDTH 2)) HEIGHT))
+(local cam (camera 0 0 (- game-width (* tile-width 2)) game-height))
 (cam:setFollowStyle "PLATFORMER")
 
-(global world (bump.newWorld TILE_WIDTH))
+(global world (bump.newWorld tile-width))
 
 ; load level id from file
 (var level 0)
@@ -30,7 +29,7 @@
 
 (tilemap.load-map (.. "source/levels/level-" level) cam)
 (player.init world tilemap)
-;(lava.init world tilemap)
+(lava.init world tilemap)
 
 (local game {})
 
@@ -41,9 +40,9 @@
     (timers.update dt)
     (animations.update dt)
     (tilemap.update dt)
-    ;(lava.update dt)
+    (lava.update dt)
     (cam:update dt)
-    (cam:follow (/ WIDTH 2) player.y)
+    (cam:follow (/ game-width 2) player.y)
     (set cam.x (math.floor cam.x))
     (set cam.y (math.floor cam.y))))
 
@@ -72,11 +71,11 @@
   (tilemap.draw)
   (player.draw)
   (animations.draw)
-  ;(lava.draw)
+  (lava.draw)
 
   (cam:detach)
   (love.graphics.setCanvas)
   (love.graphics.scale 5 5)
-  (love.graphics.draw canvas (- (/ (/ (love.graphics.getWidth) 5) 2) (/ WIDTH 2)) -20))
+  (love.graphics.draw canvas (- (/ (/ (love.graphics.getWidth) 5) 2) (/ game-width 2)) -20))
   
 game
